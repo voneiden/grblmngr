@@ -1,0 +1,153 @@
+/**
+    GrblMgmr is a frontend application to interface with Grbl via GrblMQTT
+    Copyright (C) 2016 Matti Eiden
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+body {
+
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-align-center {
+  align-items: center;
+}
+
+.flex-justify-center {
+  justify-content: center;
+}
+
+#grblmgmr-root {
+  height: 100%;
+}
+
+#sidenav {
+  flex-basis: 100px;
+  background-color: red;
+}
+
+#topnav {
+  flex-basis: 64px;
+  background-color: lime;
+}
+
+#sidenav-toggle {
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+#view {
+
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  transition: left 0.2s;
+}
+
+#sidedrawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  left: -200px;
+  overflow: auto;
+  z-index: 2;
+  background-color: #fff;
+  transition: transform 0.2s;
+}
+
+#sidedrawer.active {
+  transform: translate(200px);
+}
+
+.sidedrawer-toggle {
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 20px;
+  margin-right: 10px;
+}
+
+.sidedrawer-toggle:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+
+@media (min-width: 768px) {
+  #header {
+    left: 200px;
+  }
+
+  #sidedrawer {
+    transform: translate(200px);
+  }
+
+  #content-wrapper {
+    margin-left: 200px;
+  }
+
+  #footer {
+    margin-left: 200px;
+  }
+
+  body.hide-sidedrawer #header {
+    left: 0;
+  }
+
+  body.hide-sidedrawer #sidedrawer {
+    transform: translate(0px);
+  }
+
+  body.hide-sidedrawer #content-wrapper {
+    margin-left: 0;
+  }
+
+  body.hide-sidedrawer #footer {
+    margin-left: 0;
+  }
+}
+
+#content-wrapper {
+  min-height: 100%;
+  overflow-x: hidden;
+  margin-left: 0px;
+  transition: margin-left 0.2s;
+
+  /* sticky bottom */
+  margin-bottom: -160px;
+  padding-bottom: 160px;
+}

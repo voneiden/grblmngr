@@ -1,0 +1,46 @@
+/**
+ GrblMgmr is a frontend application to interface with Grbl via GrblMQTT
+ Copyright (C) 2016 Matti Eiden
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React from 'react';
+import classnames from 'classnames';
+import ConnectView from './ConnectView';
+export default class View extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+        }
+    }
+
+
+
+
+    render() {
+        let view = <div>No view</div>;
+        switch (this.props.name) {
+            case "ConnectView":
+                view = <ConnectView/>;
+                break;
+        }
+
+        return (
+            <div>
+                { view }
+            </div>
+        );
+    }
+}

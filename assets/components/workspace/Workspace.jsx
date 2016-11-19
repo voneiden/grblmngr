@@ -18,31 +18,87 @@
 
 import React from 'react';
 import classnames from 'classnames';
+import ViewContainer from './ViewContainer';
 import ControlView from './../views/ControlView';
 import EditorView from './../views/EditorView';
+
+/**
+ * Every ViewContainer has a deterministic "path" id that allows the workspace to modify it's workspace state
+ * root/0/0/1
+ */
 
 export default class Workspace extends React.Component {
     constructor(props) {
         super(props);
         console.log("props", props);
         this.state = {
-            //views: props.views.map((ViewComponent, i) => <ViewComponent key={i}/>)
+            space: {
+                content: [
+                    {
+                        content: [
+                            {
+                                content: "ControlView"
+                            },
+                            {
+                                content: "EditorView"
+                            }
+                        ],
+                        horizontal: false
+                    },
+                    {
+                        content: [
+                            {
+                                content: "EditorView"
+                            }
+                        ]
+                    }
+                ],
+                horizontal: true,
+                scale: 1.0
+            },
+            editing: true
         };
         console.log("state", this.state.views);
+    }
 
 
+    destroyViewContainer(path) {
+        let parent = this.state.space;
+        let target = this.state.space;
 
+        let keys = path.split("/");
+        for (let i=0; i < keys.length; i++) {
+            let key = keys[i];
+            if (key == "root") {
+                continue;
+            }
+
+            //parent = target;
+            //target = parent[
+
+        }
+    }
+
+    splitViewContainer(path, horizontal=false) {
 
     }
 
 
-
-
     render() {
-        return (
-            <div>
-                <ControlView grblStatus={this.props.grblStatus}/>
+        let test = {
+            foo: <EditorView/>
+        };
+        /*
+        <ControlView grblStatus={this.props.grblStatus}/>
                 <EditorView />
+         */
+        console.log("Test", test);
+        return (
+            <div className={ classnames({
+                "workspace": true,
+                "workspace-editing": this.state.editing,
+            })}>
+                <ViewContainer content={this.state.space} grblState={ this.props.grblState } path="root"/>
             </div>
         );
     }

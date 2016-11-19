@@ -19,7 +19,11 @@
 import React from 'react';
 import classnames from 'classnames';
 import ConnectView from './ConnectView';
-export default class View extends React.Component {
+
+/*
+ * View used for selecting a new view
+ */
+export default class ViewView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

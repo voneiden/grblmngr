@@ -43,10 +43,18 @@ body {
 .flex-justify-center {
   justify-content: center;
 }
-
+.flexy-view-container > * {
+  flex-basis: 0;
+  flex-grow: 1;
+}
 #grblmgmr-root {
   height: 100%;
 }
+
+.workspace.workspace-editing .view-container:hover {
+  border: 1px solid red;
+}
+
 
 #sidenav {
   flex-basis: 100px;
@@ -151,3 +159,4 @@ body {
   margin-bottom: -160px;
   padding-bottom: 160px;
 }
+

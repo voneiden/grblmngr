@@ -33,6 +33,7 @@ import GrblSender from '../../utils/GrblSender';
 
 export default class ControlView extends React.Component {
     constructor(props) {
+        console.log("Constructing a COntrolView");
         super(props);
         this.state = {
             jogging : false,
@@ -100,7 +101,7 @@ export default class ControlView extends React.Component {
         this.state.jogging = false;
         this.setState(this.state);
         return;
-        if (this.props.grblStatus.state == "Idle") {
+        if (this.props.grblState.state == "Idle") {
             console.log("stopJog");
             MqttClient.publish("grbl/in/realtime", "\x85");
             //MqttClient.publish("grbl/in/message", "$J=G91 X10 F100");
@@ -110,20 +111,20 @@ export default class ControlView extends React.Component {
 
 
     render() {
-        if (!this.props.grblStatus.state) {
+        if (!this.props.grblState.state) {
             return (<div>Waiting for grbl status..</div>);
         }
 
-        let machinePosition = this.props.grblStatus.MPos;
+        let machinePosition = this.props.grblState.MPos;
         if (machinePosition) {
             machinePosition = machinePosition.join(", ");
         }
 
         return (
             <div>
-                <div>Machine state: {this.props.grblStatus.state}</div>
+                <div>Machine state: {this.props.grblState.state}</div>
                 <div>Machine position: { machinePosition }</div>
-                <div>Buffer state: {this.props.grblStatus.Bf}</div>
+                <div>Buffer state: {this.props.grblState.Bf}</div>
                 <div>
                     <Button color="primary" onMouseDown={ function() { this.updateJog(-1, 1, 0) }.bind(this) } onMouseUp={ this.stopJog } onMouseLeave={ this.stopJog }>↖</Button>
                     <Button color="primary" onMouseDown={ function() { this.updateJog(0, 1, 0) }.bind(this) } onMouseUp={ this.stopJog } onMouseLeave={ this.stopJog }>↑</Button>

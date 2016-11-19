@@ -215,10 +215,10 @@ export default class Grblmgmr extends React.Component {
             contentView = <SerialView ports={this.state.serial.ports}/>
         }
         else {
-            contentView = <Workspace grblStatus={this.state.grbl.status}/>
+            contentView = <Workspace grblState={this.state.grbl.status}/>
         }
 
-
+        contentView = <Workspace grblState={this.state.grbl.status}/>
         let views = ["ConnectView"];
         return (
             <div id ="grblmgmr-root" className="flex flex-row">

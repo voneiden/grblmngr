@@ -48,6 +48,8 @@ export default class EditorView extends React.Component {
         this.startRun = this.startRun.bind(this);
         this.doRun = this.doRun.bind(this);
         this.stopRun = this.stopRun.bind(this);
+
+        this.refAceEditorCallback = this.refAceEditorCallback.bind(this);
     }
 
     onChange(newValue) {
@@ -93,12 +95,26 @@ export default class EditorView extends React.Component {
         });
     }
 
+    refAceEditorCallback(ref) {
+        this.refAceEditor = ref;
+        console.log("Reference to ace editor", ref);
+        this.refAceEditor.editor.setAutoScrollEditorIntoView(true);
+    }
+
+    componentDidUpdate() {
+        if (this.refAceEditor) {
+            this.refAceEditor.editor.resize();
+        }
+    }
+
     render() {
 
         return (
-            <div>
-                <Button color="primary" onClick={ this.doParse }>Parse</Button>
-                <Button color="primary" onClick={ this.startRun }>Run</Button>
+            <div className="editor-view flex-grow flex flex-column">
+                <div>
+                    <Button color="primary" onClick={ this.doParse }>Parse</Button>
+                    <Button color="primary" onClick={ this.startRun }>Run</Button>
+                </div>
                 <AceEditor
                     mode="gcode"
                     theme="github"
@@ -106,6 +122,10 @@ export default class EditorView extends React.Component {
                     onChange={this.onChange}
                     name="UNIQUE_ID_OF_DIV"
                     editorProps={{$blockScrolling: true}}
+                    ref={ this.refAceEditorCallback }
+                    height="auto"
+                    width="auto"
+                    className="flex-grow"
                 />
             </div>)
     }

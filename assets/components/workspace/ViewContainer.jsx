@@ -53,37 +53,40 @@ export default class ViewContainer extends React.Component {
         }
         else if (Array.isArray(self.content)) {
             if (self.content.length == 2) {
-                content = (
-                    <div className={ classnames({
-                    "flexy-view-container": true,
-                    "flex flex-column": !self.horizontal,
-                    "flex flex-row": self.horizontal
-                })}>
+
+                content = [
                         <ViewContainer content={ self.content[0] } grblState={ this.props.grblState }
                                        style={ this.scaleStyle() }
                                        path={ this.props.path + "/0" }
-                        />
+                        />,
                         <ViewContainer content={ self.content[1] } grblState={ this.props.grblState }
                                        path={ this.props.path + "/1" }
                         />
-                    </div>
-                );
-            }
-            else if (self.content.length == 1) {
-                if (viewMap[self.content[0]]) {
-                    let ContentView = viewMap[self.content[0]];
-                    content = (
-                        <ContentView grblState={ this.props.grblState }/>
-                    );
-                }
-                else {
-                    content = <div>Unknown view</div>;
-                }
+                    ];
             }
         }
+        else {
+            if (viewMap[self.content]) {
+                let ContentView = viewMap[self.content];
+                content = (
+                    <ContentView grblState={ this.props.grblState }/>
+                );
+            }
+            else {
+                console.log("SELF", self);
+                content = <div>Unknown view</div>;
+            }
+        }
+
         console.log("Our content is", content);
         return (
-            <div className="view-container" style={this.props.style}>{ content }</div>
+            <div className={classnames({
+                "view-container": true,
+                "flex-grow": true,
+                "flex": true,
+                "flex-column": !self.horizontal,
+                "flex-row": self.horizontal
+            })} style={this.props.style}>{ content }</div>
         );
     }
 }

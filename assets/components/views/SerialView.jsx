@@ -29,7 +29,7 @@ import MqttClient from '../../utils/MqttClient';
 export default class SerialView extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {connecting: false};
 
         this.handleSerialPortOpen = this.handleSerialPortOpen.bind(this);
         this.handleSerialPortRefresh = this.handleSerialPortRefresh.bind(this);
@@ -45,7 +45,7 @@ export default class SerialView extends React.Component {
         event.preventDefault();
         let comName = event.target.name;
         MqttClient.publish("grbl/serial/open", comName);
-
+        this.setState({connecting: true});
     }
 
     handleSerialPortRefresh(event) {
@@ -80,13 +80,14 @@ export default class SerialView extends React.Component {
                 onClick={ onClickCallback }>{port.comName}</Button>
         });
 
+
         return (
             <div>
                 <h1>Open port</h1>
                 <Form onSubmit={ this.handleSerialOpen }>
                     { ports }
                     <p/>
-                    <Button color="primary" onClick={ this.handleSerialPortRefresh }>Refresh</Button>
+                    <Button color="primary" onClick={ this.handleSerialPortRefresh }>Refresh</Button>;
                 </Form>
             </div>
         );

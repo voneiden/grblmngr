@@ -46,11 +46,7 @@ export default class Workspace extends React.Component {
                         horizontal: false
                     },
                     {
-                        content: [
-                            {
-                                content: "EditorView"
-                            }
-                        ]
+                        content:  "EditorView"
                     }
                 ],
                 horizontal: true,
@@ -83,6 +79,11 @@ export default class Workspace extends React.Component {
 
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        return  JSON.stringify(nextProps) != JSON.stringify(this.props)
+                || JSON.stringify(nextState) != JSON.stringify(this.state);
+    }
+
 
     render() {
         let test = {
@@ -97,6 +98,8 @@ export default class Workspace extends React.Component {
             <div className={ classnames({
                 "workspace": true,
                 "workspace-editing": this.state.editing,
+                "flex": true,
+                "flex-grow": true
             })}>
                 <ViewContainer content={this.state.space} grblState={ this.props.grblState } path="root"/>
             </div>

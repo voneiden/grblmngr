@@ -34,6 +34,8 @@ import SidebarToggle from './components/nav/SidebarToggle';
 
 import Workspace from './components/workspace/Workspace';
 
+import Clone from './utils/Clone';
+
 import ConnectView from './components/views/ConnectView';
 import SerialView from './components/views/SerialView';
 
@@ -51,7 +53,8 @@ export default class Grblmgmr extends React.Component {
         this.state = {
             sidebarForceVisible: false,
             mqtt: {
-                connected: false
+                connected: false,
+                connecting: false
             },
             serial: {
                 connecting: false,
@@ -72,6 +75,11 @@ export default class Grblmgmr extends React.Component {
     }
 
     handleMqttConnect(mqttUrl) {
+        this.setState({
+            mqtt: {
+                connecting: true
+            }
+        });
         MqttClient.connect(
             mqttUrl,
             {},
@@ -80,7 +88,8 @@ export default class Grblmgmr extends React.Component {
             function() {
                 this.setState({
                     mqtt: {
-                        connected: true
+                        connected: true,
+                        connecting: false
                     }
                 });
                 console.log("CONNECTED");
@@ -159,6 +168,8 @@ export default class Grblmgmr extends React.Component {
             // On close
             function(error) {
                 console.log("CLOSED", error);
+                // TODO a method to cancel the autoreconnect
+
                 this.setState({
                     mqtt: {
                         connected: false
@@ -209,16 +220,17 @@ export default class Grblmgmr extends React.Component {
         /* Determine if we need to render connect view, serial view or workspaces */
         let contentView;
         if (!this.state.mqtt.connected) {
-            contentView = <ConnectView connectCallback={ this.handleMqttConnect }/>
+            contentView = <ConnectView connectCallback={ this.handleMqttConnect } connecting={ this.state.mqtt.connecting }/>
         }
         else if (!this.state.serial.connected) {
             contentView = <SerialView ports={this.state.serial.ports}/>
         }
         else {
-            contentView = <Workspace grblState={this.state.grbl.status}/>
+            let grblState = Clone.deep(this.state.grbl.status);
+            contentView = <Workspace grblState={ grblState }/>
         }
 
-        contentView = <Workspace grblState={this.state.grbl.status}/>
+        //contentView = <Workspace grblState={this.state.grbl.status}/>
         let views = ["ConnectView"];
         return (
             <div id ="grblmgmr-root" className="flex flex-row">

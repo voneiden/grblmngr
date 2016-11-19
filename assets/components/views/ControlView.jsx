@@ -121,7 +121,7 @@ export default class ControlView extends React.Component {
         }
 
         return (
-            <div>
+            <div className="control-view">
                 <div>Machine state: {this.props.grblState.state}</div>
                 <div>Machine position: { machinePosition }</div>
                 <div>Buffer state: {this.props.grblState.Bf}</div>

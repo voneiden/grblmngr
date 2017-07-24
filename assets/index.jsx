@@ -18,7 +18,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var Grblmgmr = require('./grblmgmr');
+import Grblmgmr from './grblmgmr';
 
 console.log("Init grblmgr");
 

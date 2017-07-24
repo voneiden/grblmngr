@@ -97,8 +97,13 @@ export default class EditorView extends React.Component {
 
     refAceEditorCallback(ref) {
         this.refAceEditor = ref;
-        console.log("Reference to ace editor", ref);
-        this.refAceEditor.editor.setAutoScrollEditorIntoView(true);
+        if (ref) {
+            console.log("Reference to ace editor", ref);
+            this.refAceEditor.editor.setAutoScrollEditorIntoView(true);
+        }
+        else {
+            console.log("Reference to ace editor lost??");
+        }
     }
 
     componentDidUpdate() {

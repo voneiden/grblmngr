@@ -22,10 +22,12 @@ import ViewView from '../views/ViewView';
 
 import ControlView from '../views/ControlView';
 import EditorView from '../views/EditorView';
+import RenderView from '../views/RenderView';
 
 const viewMap = {
     "ControlView": ControlView,
-    "EditorView": EditorView
+    "EditorView": EditorView,
+    "RenderView": RenderView
 };
 
 export default class ViewContainer extends React.Component {

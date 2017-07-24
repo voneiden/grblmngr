@@ -25,8 +25,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
     context: __dirname,
     entry: [
-        'webpack-dev-server/client?http://localhost:3000',
-        'webpack/hot/only-dev-server',
+        'babel-polyfill',
+        'react-hot-loader/patch',
         './assets/index'
     ],
     output: {
@@ -53,17 +53,22 @@ module.exports = {
     module: {
         loaders: [
             // we pass the output from babel loader to react-hot loader
-            { test: /\.jsx?$/, exclude: /node_modules/, loaders: ['react-hot', 'babel'] },
-            { test: /\.scss$/, exclude: /node_modules/, loaders: ['style','css?localIdentName=[path][name]--[local]','sass']}
+            { test: /\.jsx?$/, exclude: /node_modules/, loaders: ['babel-loader'] },
+            { test: /\.scss$/, exclude: /node_modules/, loaders: ['style-loader', 'css-loader?localIdentName=[path][name]--[local]', 'sass-loader']},
+            {
+                enforce: "post",
+                include: [
+                    path.resolve(__dirname, 'node_modules/plotly.js'),
+                    path.resolve(__dirname, 'node_modules/gcode'),
+                    path.resolve(__dirname, 'node_modules/mapbox-gl-shaders')
+                ],
+                loader: 'transform-loader?brfs'
+            }
         ]
     },
 
     resolve: {
-        modulesDirectories: ['node_modules', 'bower_components'],
-        extensions: ['', '.js', '.jsx'],
-    },
-
-    node: {
-        fs: "empty"
+        modules: ['node_modules', 'bower_components'],
+        extensions: ['.js', '.jsx']
     }
 };

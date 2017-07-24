@@ -40,7 +40,7 @@ export default class Workspace extends React.Component {
                                 content: "ControlView"
                             },
                             {
-                                content: "EditorView"
+                                content: "RenderView"
                             }
                         ],
                         horizontal: false
@@ -83,6 +83,7 @@ export default class Workspace extends React.Component {
         return  JSON.stringify(nextProps) != JSON.stringify(this.props)
                 || JSON.stringify(nextState) != JSON.stringify(this.state);
     }
+
 
 
     render() {

@@ -17,44 +17,37 @@
  */
 
 import mqtt from 'mqtt';
-
-
-
-console.log("MQTT", mqtt);
-
 let client = null;
-
 
 export default class RestClient {
 
     static connect(mqttUrl, custom_options={}, onConnect, onError, onMessage, onClose) {
         let options = Object.assign({}, custom_options);
 
-
-
         client = mqtt.connect("ws://" + mqttUrl);
         client.on("connect", onConnect);
         client.on("error", onError);
         client.on("close", onClose);
         client.on("message", onMessage);
+        return client;
     }
 
     static publish(topic, message, custom_options={}, onDone) {
-        if (client != null && client.connected) {
+        if (client !== null && client.connected) {
             let options = Object.assign({}, custom_options);
             client.publish(topic, message, options, onDone);
         }
     }
 
     static subscribe(topic, custom_options={}, onDone) {
-        if (client != null && client.connected) {
+        if (client !== null && client.connected) {
             let options = Object.assign({}, custom_options);
             client.subscribe(topic, options, onDone);
         }
     }
 
     static unsubscribe(topic, onDone) {
-        if (client != null && client.connected) {
+        if (client !== null && client.connected) {
             client.unsubscribe(topic, onDone);
         }
     }

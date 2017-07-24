@@ -15,11 +15,67 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { AppContainer } from 'react-hot-loader'
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-import Grblmgmr from './grblmgmr';
+import Grblmgmr from './Grblmgmr';
 
-console.log("Init grblmgr");
 
-ReactDOM.render(<Grblmgmr/>, document.getElementById('grblmgmr-container'));
+import {MQTT, SERIAL, GRBL} from "./constants";
+console.log("Init grblmgmr");
+
+const rootContainer = 'grblmgmr-container';
+
+
+const initialState = {
+    mqtt: {
+        state: MQTT.DISCONNECTED
+    },
+    serial: {
+        state: SERIAL.DISCONNECTED,
+        ports: null
+    },
+    grbl: {
+        state: GRBL.IDLE,
+        X: null,
+        Y: null,
+        Z: null
+    }
+};
+
+function rootReducer(state = initialState, action) {
+    switch(action.type) {
+        default:
+            return Object.assign({}, state);
+    }
+}
+
+const store = createStore(rootReducer);
+
+function init() {
+    ReactDOM.render(
+        <AppContainer>
+            <Provider store={store}>
+                <Grblmgmr/>
+            </Provider>
+        </AppContainer>, document.getElementById(rootContainer));
+
+}
+
+init();
+
+if (module.hot) {
+    module.hot.accept('./Grblmgmr', () => {
+        ReactDOM.render(
+            <AppContainer>
+                <Provider store={store}>
+                    <Grblmgmr/>
+                </Provider>
+            </AppContainer>,
+            document.getElementById(rootContainer)
+        );
+    });
+}

@@ -17,17 +17,7 @@
  */
 
 import MqttClient from './MqttClient';
-
-
 let okCallbacks = [];
-
-/*
- * CallbackWrapper would be used to wrap the callback to offer some timeout functionalities for commands
- * if no ok is received within specified time
- */
-class CallbackWrapper {
-
-}
 
 export default class GrblSender {
     constructor() {

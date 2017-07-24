@@ -1,6 +1,6 @@
 /**
  GrblMgmr is a frontend application to interface with Grbl via GrblMQTT
- Copyright (C) 2016 Matti Eiden
+ Copyright (C) 2017 Matti Eiden
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -14,29 +14,21 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+ MachineState provides an interface to manipulate the CNC machine state
+
  */
 
-import React from 'react';
-import classnames from 'classnames';
+/* Machine interface */
+export default class MachineState {
 
-export default class Sidebar extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-        }
-    }
+}
 
+machineState = new MachineStateImpl();
 
+class MachineStateImpl {
+    constructor() {
 
-
-    render() {
-        return (
-            <div id="sidenav"
-                 className={ classnames({
-                             "force-visible": this.props.forceVisible
-            })}>
-                SIDENAV
-            </div>
-        );
     }
 }

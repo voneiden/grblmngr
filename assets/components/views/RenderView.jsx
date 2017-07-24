@@ -18,7 +18,6 @@
 
 // Render view uses three.js to produce 2d/3d representation of the machine state and loaded toolpath
 import React from 'react';
-import Plotly from 'plotly.js';
 
 
 export default class RenderView extends React.Component {
@@ -78,7 +77,7 @@ export default class RenderView extends React.Component {
                 t: 65
             }
         };
-        this.refPlot = Plotly.newPlot(this.refRoot, data, layout);
+        //this.refPlot = Plotly.newPlot(this.refRoot, data, layout);
         this.plotMounted = true
     }
 
@@ -90,7 +89,7 @@ export default class RenderView extends React.Component {
 
             var update = {x: [pos[0]], y: [pos[1]], z: [pos[2]]};
             try {
-                Plotly.restyle(this.refRoot, update, [2])
+                //Plotly.restyle(this.refRoot, update, [2])
             } catch (e) {
                 console.log("Woops");
             }
@@ -103,10 +102,10 @@ export default class RenderView extends React.Component {
     }
 
     render() {
-
         if (this.refRoot) {
             console.log("Resize!");
-            Plotly.Plots.resize(this.refRoot);
+            //Plotly.Plots.resize(this.refRoot);
+            // test sdfafd enabled!
         }
         return (
             <div ref={ this.refRootCallback } className="flex-grow">Render view!</div>

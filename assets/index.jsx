@@ -24,7 +24,8 @@ import { createStore } from 'redux';
 import Grblmgmr from './Grblmgmr';
 
 
-import {MQTT, SERIAL, GRBL} from "./constants";
+import {MqttState, SerialState, GrblState} from "./constants";
+import {MqttAction, SerialAction, GrblAction} from "./constants";
 console.log("Init grblmgmr");
 
 const rootContainer = 'grblmgmr-container';
@@ -32,14 +33,14 @@ const rootContainer = 'grblmgmr-container';
 
 const initialState = {
     mqtt: {
-        state: MQTT.DISCONNECTED
+        state: MqttState.DISCONNECTED
     },
     serial: {
-        state: SERIAL.DISCONNECTED,
+        state: SerialState.DISCONNECTED,
         ports: null
     },
     grbl: {
-        state: GRBL.IDLE,
+        state: GrblState.IDLE,
         X: null,
         Y: null,
         Z: null
@@ -48,6 +49,34 @@ const initialState = {
 
 function rootReducer(state = initialState, action) {
     switch(action.type) {
+        case MqttAction.SET_STATE:
+            return Object.assign({}, state, {
+                mqtt: {
+                    state: action.value
+                }
+            });
+
+        case SerialAction.SET_STATE:
+            return Object.assign({}, state, {
+                serial: {
+                    state: action.value
+                }
+            });
+
+        case SerialAction.SET_PORTS:
+            return Object.assign({}, state, {
+                serial: {
+                    ports: action.value
+                }
+            });
+
+        case GrblAction.SET_STATE:
+            return Object.assign({}, state, {
+                grbl: {
+                    state: action.value
+                }
+            });
+
         default:
             return Object.assign({}, state);
     }

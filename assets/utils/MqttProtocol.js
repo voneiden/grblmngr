@@ -61,7 +61,7 @@ export class MqttProtocol extends React.Component {
     }
 
     onError(error) {
-        console.warn("MQTT error", error);
+        console.warn("MqttState error", error);
         //this.props.setConnectionState(ConnectionState.DISCONNECTED);
     }
 

@@ -18,6 +18,11 @@
 
 import React from 'react';
 import autoBind from 'react-autobind';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+
+import {MqttState, SerialState} from './constants';
+
 import './styles/main.scss';
 import classNames from 'classnames';
 
@@ -41,7 +46,7 @@ import {MqttProtocol} from "./utils/MqttProtocol";
 
 //Idle, Run, Hold, Jog, Alarm, Door, Check, Home, Sleep
 
-export default class Grblmgmr extends React.Component {
+class Grblmgmr extends React.Component {
     constructor(props) {
         super(props);
 
@@ -92,10 +97,10 @@ export default class Grblmgmr extends React.Component {
     render() {
         /* Determine if we need to render connect view, serial view or workspaces */
         let contentView;
-        if (!this.state.mqtt.connected) {
+        if (this.props.mqttState !== MqttState.CONNECTED) {
             contentView = <ConnectView connectCallback={ this.doMqttConnect } connecting={ this.state.mqtt.connecting }/>
         }
-        else if (!this.state.serial.connected) {
+        else if (this.props.serialState !== SerialState.CONNECTED) {
             contentView = <SerialView ports={this.state.serial.ports}/>
         }
         else {
@@ -122,3 +127,16 @@ export default class Grblmgmr extends React.Component {
         );
     }
 }
+
+Grblmgmr.propTypes = {
+    mqttState: PropTypes.symbol.isRequired,
+    serialState: PropTypes.symbol.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        mqttState: state.mqtt.state,
+        serialState: state.serial.state
+    }
+}
+export default connect(mapStateToProps)(Grblmgmr);

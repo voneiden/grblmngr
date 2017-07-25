@@ -95,7 +95,7 @@ class Workspace extends React.Component {
         <ControlView grblStatus={this.props.grblStatus}/>
                 <EditorView />
          */
-        console.log("Test", test);
+        //console.log("Test", test);
         return (
             <div className={ classnames({
                 "workspace": true,

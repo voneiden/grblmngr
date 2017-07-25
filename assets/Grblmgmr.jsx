@@ -62,18 +62,12 @@ class Grblmgmr extends React.Component {
         let contentView;
         if (this.props.mqttState !== MqttState.CONNECTED) {
             contentView = <ConnectView doConnect={ this.doMqttConnect }/>
-        }
-        else if (this.props.serialState !== SerialState.CONNECTED) {
+        } else if (this.props.serialState !== SerialState.CONNECTED) {
             contentView = <SerialView/>
-        }
-        else {
-            // TODO
-            //let grblState = Clone.deep(this.state.grbl.status);
+        } else {
             contentView = <Workspace/>
         }
 
-        //contentView = <Workspace grblState={this.state.grbl.status}/>
-        let views = ["ConnectView"];
         return (
             <div id ="grblmgmr-root" className="flex flex-row">
                 <div id="main" className="flex-grow flex flex-column">

@@ -13,7 +13,7 @@
     "muicss": "0.9.3",
     "mqtt": "2.0.1",
     "react-ace": "4.0.0",
-    "three": "0.82.1",
+    "three": "0.86.0",
     "gcode": "0.4.0",
     "prop-types": "15.5.10",
     "react-autobind": "1.0.6",

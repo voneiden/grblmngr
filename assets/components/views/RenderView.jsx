@@ -18,71 +18,109 @@
 
 // Render view uses three.js to produce 2d/3d representation of the machine state and loaded toolpath
 import React from 'react';
+import ReactDOM from 'react-dom';
+import * as Three from 'three';
+import autoBind from 'react-autobind';
 
+function cube( size ) {
+    var h = size * 0.5;
+    var geometry = new Three.Geometry();
+    geometry.vertices.push(
+        new Three.Vector3( -h, -h, -h ),
+        new Three.Vector3( -h, h, -h ),
+        new Three.Vector3( -h, h, -h ),
+        new Three.Vector3( h, h, -h ),
+        new Three.Vector3( h, h, -h ),
+        new Three.Vector3( h, -h, -h ),
+        new Three.Vector3( h, -h, -h ),
+        new Three.Vector3( -h, -h, -h ),
+        new Three.Vector3( -h, -h, h ),
+        new Three.Vector3( -h, h, h ),
+        new Three.Vector3( -h, h, h ),
+        new Three.Vector3( h, h, h ),
+        new Three.Vector3( h, h, h ),
+        new Three.Vector3( h, -h, h ),
+        new Three.Vector3( h, -h, h ),
+        new Three.Vector3( -h, -h, h ),
+        new Three.Vector3( -h, -h, -h ),
+        new Three.Vector3( -h, -h, h ),
+        new Three.Vector3( -h, h, -h ),
+        new Three.Vector3( -h, h, h ),
+        new Three.Vector3( h, h, -h ),
+        new Three.Vector3( h, h, h ),
+        new Three.Vector3( h, -h, -h ),
+        new Three.Vector3( h, -h, h )
+    );
+    return geometry;
+}
 
 export default class RenderView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
-        this.refRoot;
-        this.plotMounted = false;
 
-        this.refRootCallback = this.refRootCallback.bind(this);
+        autoBind(this);
+        this._zoom = null;
+        this._canvas = null;
+        this._scene = null;
+        this._camera = null;
+        this._renderer = null;
+    }
+
+    setRendererSize() {
+        let node = ReactDOM.findDOMNode(this);
+        if (this._renderer) {
+            this._renderer.setSize(node.clientWidth, node.clientHeight);
+        }
+    }
+
+    setOrthographiCameraSize() {
+        let node = ReactDOM.findDOMNode(this);
+        let aspectRatio = node.clientWidth / node.clientHeight;
+        this._camera.left = this._zoom / -2;
+        this._camera.right = this._zoom / 2;
+        this._camera.top = this._zoom / aspectRatio / -2;
+        this._camera.bottom = this._zoom / aspectRatio / 2;
+        console.log(this._camera.left, this._camera.right, this._camera.top, this._camera.bottom);
+        this._camera.updateProjectionMatrix();
     }
 
     componentDidMount() {
-        var trace1 = {
-            x: [1,2,3,4,5],
-            y: [4,2,6,3,5],
-            z: [0,0,1,1,10],
-            mode: 'lines',
-            marker: {
-                color: '#1f77b4',
-                size: 12,
-                symbol: 'circle',
-                line: {
-                    color: 'rgb(0,0,0)',
-                    width: 0
-                }},
-            line: {
-                color: '#1f77b4',
-                width: 1
-            },
-            type: 'scatter3d'
-        };
-        var trace2 = {
-            x: [0],
-            y: [0],
-            z: [0],
-            mode: 'markers',
-            marker: {
-                color: '#1f77b4',
-                size: 12,
-                symbol: 'circle',
-                line: {
-                    color: 'rgb(0,0,0)',
-                    width: 0
-                }
-            },
-            type: "scatter3d"
-        };
-        var data = [trace1, trace2];
-        var layout = {
-            title: '3D Line Plot',
-            autosize: true,
-            margin: {
-                l: 0,
-                r: 0,
-                b: 0,
-                t: 65
-            }
-        };
-        //this.refPlot = Plotly.newPlot(this.refRoot, data, layout);
-        this.plotMounted = true
+        let node = ReactDOM.findDOMNode(this);
+
+        this._renderer = new Three.WebGLRenderer({canvas: this._canvas});
+        this.setRendererSize();
+
+        this._scene = new Three.Scene();
+
+        this._zoom = 1000;
+        this._camera = new Three.OrthographicCamera(-100,100,100,-100);
+        this._camera.position.z = 150;
+        this.setOrthographiCameraSize();
+        this._scene.add(this._camera);
+
+        let geometryCube = cube( 50 );
+        geometryCube.computeLineDistances();
+        let object = new Three.LineSegments( geometryCube, new Three.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ) );
+        this._scene.add( object );
+
+        window.addEventListener("resize", this.onWindowResize);
+        this._renderer.setPixelRatio( window.devicePixelRatio );
+        this._renderer.render(this._scene, this._camera);
+
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.onWindowResize)
+    }
+
+    onWindowResize() {
+        this.setRendererSize();
+        this.setOrthographiCameraSize();
+        this._renderer.render(this._scene, this._camera);
     }
 
     componentDidUpdate() {
-        console.log(this.props.grblState);
         if (this.refRoot && this.plotMounted) {
             console.log(this.refRoot, this.plotMounted);
             let pos = this.props.grblState.MPos;
@@ -102,13 +140,10 @@ export default class RenderView extends React.Component {
     }
 
     render() {
-        if (this.refRoot) {
-            console.log("Resize!");
-            //Plotly.Plots.resize(this.refRoot);
-            // test sdfafd enabled!
-        }
         return (
-            <div ref={ this.refRootCallback } className="flex-grow">Render view!</div>
+            <div ref={ this.refRootCallback } className="flex-grow render-view">
+                <canvas ref={(r) => this._canvas = r}/>
+            </div>
         );
     }
 }

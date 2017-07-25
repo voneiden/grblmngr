@@ -19,13 +19,18 @@
 body {
 
 }
-
+.render-view {
+  overflow: hidden;
+}
 .flex {
   display: flex;
 }
 
 .flex-grow {
   flex-grow: 1;
+}
+.flex-shrink {
+  flex-shrink: 1;
 }
 
 .flex-column {

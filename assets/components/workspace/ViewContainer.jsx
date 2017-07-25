@@ -49,12 +49,12 @@ export default class ViewContainer extends React.Component {
     render() {
         let self = this.props.content;
         let content;
-        console.log("This props content", this.props.content);
-        if (self.content == null) {
+        //console.log("This props content", this.props.content);
+        if (self.content === null) {
             content = <ViewView/>;
         }
         else if (Array.isArray(self.content)) {
-            if (self.content.length == 2) {
+            if (self.content.length === 2) {
 
                 content = [
                         <ViewContainer content={ self.content[0] } grblState={ this.props.grblState }
@@ -80,7 +80,7 @@ export default class ViewContainer extends React.Component {
             }
         }
 
-        console.log("Our content is", content);
+        //console.log("Our content is", content);
         return (
             <div className={classnames({
                 "view-container": true,

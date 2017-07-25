@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import {connect} from 'react-redux';
 import classnames from 'classnames';
 import ViewContainer from './ViewContainer';
 import ControlView from './../views/ControlView';
@@ -27,7 +28,7 @@ import EditorView from './../views/EditorView';
  * root/0/0/1
  */
 
-export default class Workspace extends React.Component {
+class Workspace extends React.Component {
     constructor(props) {
         super(props);
         console.log("props", props);
@@ -107,3 +108,10 @@ export default class Workspace extends React.Component {
         );
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        grblState: state.grbl.state,
+    }
+}
+export default connect(mapStateToProps)(Workspace);

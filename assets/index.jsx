@@ -22,7 +22,7 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 
 import Grblmgmr from './Grblmgmr';
-
+import MqttProtocol from 'utils/MqttProtocol';
 
 import {MqttState, SerialState, GrblState} from "./GMConstants";
 import {MqttAction, SerialAction, GrblAction} from "./GMConstants";
@@ -48,6 +48,7 @@ const initialState = {
 };
 
 function rootReducer(state = initialState, action) {
+    let serial;
     switch(action.type) {
         case MqttAction.SET_STATE:
             return Object.assign({}, state, {
@@ -57,18 +58,13 @@ function rootReducer(state = initialState, action) {
             });
 
         case SerialAction.SET_STATE:
-            return Object.assign({}, state, {
-                serial: {
-                    state: action.value
-                }
-            });
+            serial = Object.assign({}, state.serial, {state: action.value});
+            return Object.assign({}, state, {serial: serial});
 
         case SerialAction.SET_PORTS:
-            return Object.assign({}, state, {
-                serial: {
-                    ports: action.value
-                }
-            });
+            serial = Object.assign({}, state.serial, {ports: action.value});
+            return Object.assign({}, state, {serial: serial});
+
 
         case GrblAction.SET_STATE:
             return Object.assign({}, state, {
@@ -83,6 +79,7 @@ function rootReducer(state = initialState, action) {
 }
 
 const store = createStore(rootReducer);
+MqttProtocol.setStore(store);
 
 function init() {
     ReactDOM.render(
@@ -91,7 +88,6 @@ function init() {
                 <Grblmgmr/>
             </Provider>
         </AppContainer>, document.getElementById(rootContainer));
-
 }
 
 init();

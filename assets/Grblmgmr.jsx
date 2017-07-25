@@ -27,6 +27,7 @@ import './styles/main.scss';
 import classNames from 'classnames';
 
 import MqttClient from './utils/MqttClient';
+import MqttProtocol from 'utils/MqttProtocol';
 import GrblSender from './utils/GrblSender';
 
 import './styles/mui.scss';
@@ -37,7 +38,6 @@ import Clone from './utils/Clone';
 
 import ConnectView from './components/views/ConnectView';
 import SerialView from './components/views/SerialView';
-import {MqttProtocol} from "./utils/MqttProtocol";
 
 //import GrblInterface from './utils/GrblInterface';
 
@@ -54,7 +54,7 @@ class Grblmgmr extends React.Component {
     }
 
     doMqttConnect(mqttUrl) {
-        this._mqttProtocol.connect(mqttUrl, {});
+        MqttProtocol.connect(mqttUrl, {});
     }
 
     render() {
@@ -68,8 +68,8 @@ class Grblmgmr extends React.Component {
         }
         else {
             // TODO
-            let grblState = Clone.deep(this.state.grbl.status);
-            contentView = <Workspace grblState={ grblState }/>
+            //let grblState = Clone.deep(this.state.grbl.status);
+            contentView = <Workspace/>
         }
 
         //contentView = <Workspace grblState={this.state.grbl.status}/>
@@ -81,26 +81,20 @@ class Grblmgmr extends React.Component {
                     </div>
                     { contentView }
                 </div>
-                <MqttProtocol
-                    setConnectionState={ (connectionState) => this.setConnectionState(connectionState) }
-                    setSerialPorts={ (serialPorts) => this.setSerialPorts(serialPorts) }
-                    setSerialState={ (serialState) => this.setSerialState(serialState) }
-                    ref={(ref) => this._mqttProtocol = ref }
-                />
             </div>
         );
     }
 }
 
 Grblmgmr.propTypes = {
-    mqttState: PropTypes.symbol.isRequired,
-    serialState: PropTypes.symbol.isRequired
+    mqttState: PropTypes.symbol,
+    serialState: PropTypes.symbol
 };
 
 function mapStateToProps(state) {
     return {
         mqttState: state.mqtt.state,
         serialState: state.serial.state
-    }
+    };
 }
 export default connect(mapStateToProps)(Grblmgmr);

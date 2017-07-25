@@ -29,7 +29,7 @@ import StorageUtil from '../../utils/StorageUtil';
 
 import MqttClient from '../../utils/MqttClient';
 
-export default class SerialView extends React.Component {
+class SerialView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {connecting: false};
@@ -68,7 +68,7 @@ export default class SerialView extends React.Component {
     renderPortList() {
         // TODO handle ports.error
         let onClickCallback = this.handleSerialPortOpen;
-        let ports = this.props.ports.ports.map(function (port, index) {
+        let ports = this.props.ports.map(function (port, index) {
             return <Button
                 color="primary"
                 key={ "port-btn-" + index }
@@ -90,12 +90,13 @@ export default class SerialView extends React.Component {
 }
 
 SerialView.propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    doConnect: PropTypes.func.isRequired
+    dispatch: PropTypes.func,
 };
 
 function mapStateToProps(state) {
+    console.log("STATE SERIAL PORTS", state.serial.ports);
     return {
+        ports: state.serial.ports ? state.serial.ports : []
     }
 }
 export default connect(mapStateToProps)(SerialView);

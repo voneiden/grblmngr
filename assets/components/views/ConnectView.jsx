@@ -27,7 +27,7 @@ import Button from 'muicss/lib/react/button';
 
 import StorageUtil from '../../utils/StorageUtil';
 
-export default class ConnectView extends React.Component {
+class ConnectView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -62,7 +62,7 @@ export default class ConnectView extends React.Component {
 }
 
 ConnectView.propTypes = {
-    dispatch: PropTypes.func.isRequired,
+    dispatch: PropTypes.func,
     doConnect: PropTypes.func.isRequired
 };
 

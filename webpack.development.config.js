@@ -70,7 +70,7 @@ module.exports = {
     },
 
     resolve: {
-        modules: ['node_modules', 'bower_components', "assets"],
+        modules: ["assets", 'node_modules', 'bower_components'],
         extensions: ['.js', '.jsx']
     }
 };

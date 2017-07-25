@@ -19,10 +19,11 @@ export const MqttAction = Enum("SET_STATE");
 
 /**
  * @property {symbol} DISCONNECTED
+ * @property {symbol} FETCH_PORTS
  * @property {symbol} CONNECTING
  * @property {symbol} CONNECTED
  */
-export const SerialState = Enum("DISCONNECTED", "CONNECTING", "CONNECTED");
+export const SerialState = Enum("DISCONNECTED", "FETCH_PORTS", "CONNECTING", "CONNECTED");
 
 /**
  * @property {symbol} SET_STATE

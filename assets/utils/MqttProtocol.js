@@ -28,12 +28,16 @@ import MqttClient from './MqttClient';
 import GrblSender from './GrblSender';
 import {MqttAction, MqttState, SerialAction, SerialState, GrblAction, GrblState} from 'GMConstants';
 
+let store = null;
 
-class MqttProtocol extends React.Component {
-    constructor(props) {
-        super(props);
+class MqttProtocol {
+    constructor() {
         this._client = null;
         autoBind(this);
+    }
+
+    setStore(newStore) {
+        store = newStore;
     }
 
     connect(mqttUrl, customOptions) {
@@ -42,20 +46,14 @@ class MqttProtocol extends React.Component {
         }
         // TODO
         this._client = MqttClient.connect(mqttUrl, customOptions, this.onConnect, this.onError, this.onMessage, this.onClose)
-        this.props.dispatch({
+        store.dispatch({
             type: MqttAction.SET_STATE,
             value: MqttState.CONNECTING
         })
     }
 
     onConnect() {
-        this.setState({
-            mqtt: {
-                connected: true,
-                connecting: false
-            }
-        });
-        this.props.dispatch({
+        store.dispatch({
             type: MqttAction.SET_STATE,
             value: MqttState.CONNECTED
         });
@@ -69,7 +67,7 @@ class MqttProtocol extends React.Component {
 
     onError(error) {
         console.warn("MqttState error", error);
-        this.props.dispatch({
+        store.dispatch({
             type: MqttAction.SET_STATE,
             value: MqttState.DISCONNECTED
         });
@@ -106,18 +104,28 @@ class MqttProtocol extends React.Component {
                                 if (!connected) {
                                     console.log("Request serial list");
                                     MqttClient.publish("grbl/serial/list");
+                                    store.dispatch({
+                                        type: SerialAction.SET_STATE,
+                                        value: SerialState.FETCH_PORTS
+                                    });
+                                } else {
+                                    store.dispatch({
+                                        type: SerialAction.SET_STATE,
+                                        value: SerialState.CONNECTED
+                                    });
                                 }
-                                this.props.dispatch({
-                                    type: SerialAction.SET_STATE,
-                                    value: SerialState.CONNECTED
-                                });
+
                                 break;
 
                             case "list":
                                 console.log("Received serial ports");
-                                this.props.dispatch({
+                                store.dispatch({
                                     type: SerialAction.SET_PORTS,
-                                    value: JSON.parse(message)
+                                    value: JSON.parse(message).ports
+                                });
+                                store.dispatch({
+                                    type: SerialAction.SET_STATE,
+                                    value: SerialState.DISCONNECTED
                                 });
                                 break;
 
@@ -138,8 +146,7 @@ class MqttProtocol extends React.Component {
 
     onClose(error) {
         console.log("CLOSED", error);
-        //this.props.setConnectionState(ConnectionState.DISCONNECTED);
-        this.props.dispatch({
+        store.dispatch({
             type: MqttAction.SET_STATE,
             value: MqttState.DISCONNECTED
         });
@@ -172,22 +179,12 @@ class MqttProtocol extends React.Component {
             }
         }
 
-        let mergedParams = Object.assign(this.state.grbl.status, params);
-        this.setState({"grbl": {"status": mergedParams}});
         // TODO is status needed here?
-        this.props.dispatch({
+        store.dispatch({
             type: GrblAction.SET_STATE,
-            value: {"status": mergedParams}
+            value: params
         });
-    }
-
-    render() {
-        return null;
     }
 }
 
-MqttProtocol.propTypes = {
-    dispatch: PropTypes.func.isRequired
-};
-
-export default connect(null)(MqttProtocol);
+export default new MqttProtocol();

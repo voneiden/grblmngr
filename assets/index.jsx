@@ -24,8 +24,8 @@ import { createStore } from 'redux';
 import Grblmgmr from './Grblmgmr';
 
 
-import {MqttState, SerialState, GrblState} from "./constants";
-import {MqttAction, SerialAction, GrblAction} from "./constants";
+import {MqttState, SerialState, GrblState} from "./GMConstants";
+import {MqttAction, SerialAction, GrblAction} from "./GMConstants";
 console.log("Init grblmgmr");
 
 const rootContainer = 'grblmgmr-container';

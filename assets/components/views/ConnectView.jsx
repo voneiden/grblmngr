@@ -17,6 +17,9 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
+import autoBind from 'react-autobind';
+import {connect} from 'react-redux';
 import classnames from 'classnames';
 import Form from 'muicss/lib/react/form';
 import Input from 'muicss/lib/react/input';
@@ -30,15 +33,13 @@ export default class ConnectView extends React.Component {
         this.state = {
             mqttUrl: StorageUtil.get("mqttUrl", "localhost:1886")
         };
-
-        this.handleConnectSubmit = this.handleConnectSubmit.bind(this);
-        this.handleMqttUrlChange = this.handleMqttUrlChange.bind(this);
+        autoBind(this);
     }
 
     handleConnectSubmit(event) {
         console.log("Submit");
         event.preventDefault();
-        this.props.connectCallback(this.state.mqttUrl);
+        this.props.doConnect(this.state.mqttUrl);
     }
 
     handleMqttUrlChange(event) {
@@ -46,9 +47,6 @@ export default class ConnectView extends React.Component {
             mqttUrl: event.target.value
         });
     }
-
-
-
 
     render() {
         console.log(this.state.mqttUrl);
@@ -62,3 +60,14 @@ export default class ConnectView extends React.Component {
         );
     }
 }
+
+ConnectView.propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    doConnect: PropTypes.func.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+    }
+}
+export default connect(mapStateToProps)(ConnectView);

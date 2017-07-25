@@ -21,7 +21,7 @@ import autoBind from 'react-autobind';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {MqttState, SerialState} from './constants';
+import {MqttState, SerialState} from './GMConstants';
 
 import './styles/main.scss';
 import classNames from 'classnames';
@@ -49,24 +49,6 @@ import {MqttProtocol} from "./utils/MqttProtocol";
 class Grblmgmr extends React.Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            sidebarForceVisible: false,
-            mqtt: {
-                connected: false,
-                connecting: false
-            },
-            serial: {
-                connecting: false,
-                connected: null,
-                ports: null
-            },
-            grbl: {
-                status: {}
-            }
-
-
-        };
         this._mqttProtocol = null;
         autoBind(this);
     }
@@ -75,35 +57,17 @@ class Grblmgmr extends React.Component {
         this._mqttProtocol.connect(mqttUrl, {});
     }
 
-
-    setConnectionState(connectionState) {
-        this.setState({
-            connection: connectionState
-        });
-    }
-
-    setSerialPorts(serialPorts) {
-        this.setState({
-            serialPorts: serialPorts
-        });
-    }
-
-    setSerialState(serialState) {
-        this.setState({
-            serialState: serialState
-        });
-    }
-
     render() {
         /* Determine if we need to render connect view, serial view or workspaces */
         let contentView;
         if (this.props.mqttState !== MqttState.CONNECTED) {
-            contentView = <ConnectView connectCallback={ this.doMqttConnect } connecting={ this.state.mqtt.connecting }/>
+            contentView = <ConnectView doConnect={ this.doMqttConnect }/>
         }
         else if (this.props.serialState !== SerialState.CONNECTED) {
-            contentView = <SerialView ports={this.state.serial.ports}/>
+            contentView = <SerialView/>
         }
         else {
+            // TODO
             let grblState = Clone.deep(this.state.grbl.status);
             contentView = <Workspace grblState={ grblState }/>
         }

@@ -17,6 +17,9 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
+import autoBind from 'react-autobind';
+import {connect} from 'react-redux';
 import classnames from 'classnames';
 import Form from 'muicss/lib/react/form';
 import Input from 'muicss/lib/react/input';
@@ -30,16 +33,8 @@ export default class SerialView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {connecting: false};
-
-        this.handleSerialPortOpen = this.handleSerialPortOpen.bind(this);
-        this.handleSerialPortRefresh = this.handleSerialPortRefresh.bind(this);
-
-        this.renderFetchingPorts = this.renderFetchingPorts.bind(this);
-        this.renderPortList = this.renderPortList.bind(this);
-
+        autoBind(this);
     }
-
-
 
     handleSerialPortOpen(event) {
         event.preventDefault();
@@ -55,7 +50,8 @@ export default class SerialView extends React.Component {
 
     render() {
         console.log(this.state.mqttUrl);
-        if (this.props.ports == null) {
+        // TODO this is way too ugly
+        if (this.props.ports === null) {
             return this.renderFetchingPorts();
         }
         else {
@@ -80,7 +76,6 @@ export default class SerialView extends React.Component {
                 onClick={ onClickCallback }>{port.comName}</Button>
         });
 
-
         return (
             <div>
                 <h1>Open port</h1>
@@ -93,3 +88,14 @@ export default class SerialView extends React.Component {
         );
     }
 }
+
+SerialView.propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    doConnect: PropTypes.func.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+    }
+}
+export default connect(mapStateToProps)(SerialView);

@@ -65,6 +65,11 @@ export default class RenderView extends React.Component {
         this._scene = null;
         this._camera = null;
         this._renderer = null;
+        this._raycaster = null;
+        this._mouse = {
+            x: 0,
+            y: 0
+        }
     }
 
     setRendererSize() {
@@ -87,6 +92,7 @@ export default class RenderView extends React.Component {
 
     componentDidMount() {
         let node = ReactDOM.findDOMNode(this);
+        node.addEventListener("mousemove", this.onMouseMove, false);
 
         this._renderer = new Three.WebGLRenderer({canvas: this._canvas});
         this.setRendererSize();
@@ -108,6 +114,22 @@ export default class RenderView extends React.Component {
         this._renderer.setPixelRatio( window.devicePixelRatio );
         this._renderer.render(this._scene, this._camera);
 
+        this._raycaster = new Three.Raycaster();
+        this._raycaster.linePrecision = 3;
+        this.glRender();
+    }
+
+    onMouseMove(event) {
+        let node = ReactDOM.findDOMNode(this);
+        this._mouse.x = (event.pageX - node.offsetLeft) / node.offsetWidth * 2 - 1;
+        this._mouse.y = -(event.pageY - node.offsetTop) / node.offsetHeight * 2 + 1;
+        console.log("Mousemove", this._mouse);
+    }
+    glRender() {
+
+        this._raycaster.setFromCamera(this._mouse, this._camera);
+        console.log(this._raycaster.intersectObjects(this._scene.children, true));
+        requestAnimationFrame(this.glRender);
     }
 
     componentWillUnmount() {

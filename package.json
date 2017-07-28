@@ -15,6 +15,7 @@
     "react-ace": "4.0.0",
     "three": "0.86.0",
     "gcode": "0.4.0",
+    "gcode-toolpath": "1.1.1",
     "prop-types": "15.5.10",
     "react-autobind": "1.0.6",
     "react-redux": "5.0.5",

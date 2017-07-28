@@ -32,6 +32,7 @@ export const SerialState = Enum("DISCONNECTED", "FETCH_PORTS", "CONNECTING", "CO
 export const SerialAction = Enum("SET_STATE", "SET_PORTS");
 
 /**
+ * @property {symbol} UNKNOWN - Grbl state is not known
  * @property {symbol} IDLE  - Grbl state when the machine is not doing anything
  * @property {symbol} RUN   - Grbl state when the machine is executing code
  * @property {symbol} HOLD  - Grbl state when feed hold is issued
@@ -42,9 +43,17 @@ export const SerialAction = Enum("SET_STATE", "SET_PORTS");
  * @property {symbol} HOME  - Grbl state when homing
  * @property {symbol} SLEEP - Grbl state when sleeping
  *///Idle, Run, Hold, Jog, Alarm, Door, Check, Home, Sleep
-export const GrblState = Enum("IDLE", "RUN", "HOLD", "JOG", "ALARM", "DOOR", "CHECK", "HOME", "SLEEP");
+export const GrblState = Enum("UNKNOWN", "IDLE", "RUN", "HOLD", "JOG", "ALARM", "DOOR", "CHECK", "HOME", "SLEEP");
 
 /**
  * @property {symbol} SET_STATE
  */
 export const GrblAction = Enum("SET_STATE");
+
+/**
+ * @property {symbol} LINEAR
+ * @property {symbol} RAPID
+ * @property {symbol} CW_ARC
+ * @property {symbol} CCW_ARC
+ */
+export const Modals = Enum("LINEAR", "RAPID", "CW_ARC", "CCW_ARC");

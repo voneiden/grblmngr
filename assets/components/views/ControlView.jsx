@@ -1,6 +1,6 @@
 /**
  GrblMgmr is a frontend application to interface with Grbl via GrblMQTT
- Copyright (C) 2016 Matti Eiden
+ Copyright (C) 2016-2017 Matti Eiden
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ export default class ControlView extends React.Component {
         this.state.jogging = false;
         this.setState(this.state);
         return;
-        if (this.props.grblState.state == "Idle") {
+        if (this.props.grblState.state === "Idle") {
             console.log("stopJog");
             MqttClient.publish("grbl/in/realtime", "\x85");
             //MqttClient.publish("grbl/in/message", "$J=G91 X10 F100");

@@ -19,60 +19,10 @@
 /**
  * GParser takes line(s) of GCode
  */
-import Enum from 'es6-enum';
 
-const regexClean = /[^\dGXYZIJKF.+-]/gi;
+import {MotionMode, UnitMode, NonModalCommand, DistanceMode, ArcDistanceMode, FeedRateMode} from "./GCodeConstants";
 
-/**
- * @property {Symbol} DWELL
- * @property {Symbol} RETURN_TO_HOME
- * @property {Symbol} RETURN_TO_SECONDARY_HOME
- * @type {Enum}
- */
-const NonModalCommand = new Enum("DWELL", "RETURN_TO_HOME", "RETURN_TO_SECONDARY_HOME"); // G4, G28, G30
-
-/**
- * @property {Symbol} RAPID
- * @property {Symbol} LINEAR
- * @property {Symbol} CW_ARC
- * @property {Symbol} CCW_ARC
- * @property {Symbol} PROBE_TOWARD_STOP_OR_ERROR
- * @property {Symbol} PROBE_TOWARD_STOP
- * @property {Symbol} PROBE_AWAY_STOP_OR_ERROR
- * @property {Symbol} PROBE_AWAY_STOP
- * @type {Enum}
- */
-const MotionMode = new Enum("RAPID", "LINEAR", "CW_ARC", "CCW_ARC", "PROBE_TOWARD_STOP_OR_ERROR", "PROBE_TOWARD_STOP", "PROBE_AWAY_STOP_OR_ERROR", "PROBE_AWAY_STOP"); // G0 G1 G2 G3 G38.2 G38.3 G38.4 G38.5
-
-/**
- * @property {Symbol} INVERSE_TIME
- * @property {Symbol} UNITS_PER_MINUTE
- * @type {Enum}
- */
-const FeedRateMode = new Enum("INVERSE_TIME", "UNITS_PER_MINUTE"); // G93 G94
-
-/**
- * @property {Symbol} IMPERIAL
- * @property {Symbol} METRIC
- * @type {Enum}
- */
-const UnitMode = new Enum("IMPERIAL", "METRIC"); // G20 G21
-
-/**
- * @property {Symbol} ABSOLUTE
- * @property {Symbol} RELATIVE
- * @type {Enum}
- */
-const DistanceMode = new Enum("ABSOLUTE", "RELATIVE"); //G90 G91
-
-/**
- * @property {Symbol} RELATIVE
- * @type {Enum}
- */
-const ArcDistanceMode = new Enum("RELATIVE"); // G91.1
-
-
-const GCodeMap = {
+export const GCodeMap = {
     G0: MotionMode.RAPID,
     G1: MotionMode.LINEAR,
     G2: MotionMode.CW_ARC,
@@ -91,19 +41,87 @@ const GCodeMap = {
     "G91.1": ArcDistanceMode.RELATIVE,
     G93: FeedRateMode.INVERSE_TIME,
     G94: FeedRateMode.UNITS_PER_MINUTE
-
 };
 
-class GParser {
-    static parseLines(line) {
+// TODO custom implementation of es6-enum
+export const GCodeType = {
+    G0: MotionMode,
+    G1: MotionMode,
+    G2: MotionMode,
+    G3: MotionMode,
+    G4: NonModalCommand,
+    G20: UnitMode,
+    G21: UnitMode,
+    G28: NonModalCommand,
+    G30: NonModalCommand,
+    "G38.2": NonModalCommand,
+    "G38.3": NonModalCommand,
+    "G38.4": NonModalCommand,
+    "G38.5": NonModalCommand,
+    G90: DistanceMode,
+    G91: DistanceMode,
+    "G91.1": ArcDistanceMode,
+    G93: FeedRateMode,
+    G94: FeedRateMode
+};
 
+export default class GCodeParser {
+    static parseLines(lines) {
+        // TODO webworkers
+        return parseLines(lines);
     }
-    static interpretLine(line) {
-        line = line.replace(regexClean, "");
+    static parseLine(line) {
+        return readCommandsRegex(line);
     }
 }
 
+function parseLines(lines) {
+    let results = new Array(lines.length);
+    let j = 0;
+    let result;
+    for (let i=0; i < lines.length; i++) {
+        result = readCommandsRegex(lines[i]);
+        if (result) {
+            j++;
+            results[j] = result;
+        }
+    }
+    results.length = j;
+    return results;
+}
 
+const cleaner = /\s/g;
+const commandMatcher = /([GXYZF])+(\d+(?:\.\d+)?)/gi;
+function readCommandsRegex(line) {
+    // Get rid of whitespaces
+    let output = {};
+    line = line.replace(cleaner, "");
+    let commands = line.match(commandMatcher);
+    if (commands) {
+        for (let i=0; i < commands.length; i++) {
+            commandToOutput(commands[i], output);
+        }
+        return output;
+    }
+    return null;
+}
+
+function commandToOutput(command, output) {
+    let key = command[0].toUpperCase();
+    switch (key) {
+        case "G":
+            command = command.toUpperCase();
+            let type = GCodeType[command];
+            output[type] = GCodeMap[command];
+            return;
+        case "F":
+        case "X":
+        case "Y":
+        case "Z":
+            output[key] = command.slice(1);
+            return;
+    }
+}
 /*
 
 UNITS_METRIC = 20;

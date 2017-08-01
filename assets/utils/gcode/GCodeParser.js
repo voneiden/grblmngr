@@ -20,50 +20,9 @@
  * GParser takes line(s) of GCode
  */
 
-import {MotionMode, UnitMode, NonModalCommand, DistanceMode, ArcDistanceMode, FeedRateMode} from "./GCodeConstants";
 
-export const GCodeMap = {
-    G0: MotionMode.RAPID,
-    G1: MotionMode.LINEAR,
-    G2: MotionMode.CW_ARC,
-    G3: MotionMode.CCW_ARC,
-    G4: NonModalCommand.DWELL,
-    G20: UnitMode.IMPERIAL,
-    G21: UnitMode.METRIC,
-    G28: NonModalCommand.RETURN_TO_HOME,
-    G30: NonModalCommand.RETURN_TO_SECONDARY_HOME,
-    "G38.2": NonModalCommand.PROBE_TOWARD_STOP_OR_ERROR,
-    "G38.3": NonModalCommand.PROBE_TOWARD_STOP,
-    "G38.4": NonModalCommand.PROBE_AWAY_STOP_OR_ERROR,
-    "G38.5": NonModalCommand.PROBE_AWAY_STOP,
-    G90: DistanceMode.ABSOLUTE,
-    G91: DistanceMode.RELATIVE,
-    "G91.1": ArcDistanceMode.RELATIVE,
-    G93: FeedRateMode.INVERSE_TIME,
-    G94: FeedRateMode.UNITS_PER_MINUTE
-};
 
-// TODO custom implementation of es6-enum
-export const GCodeType = {
-    G0: MotionMode,
-    G1: MotionMode,
-    G2: MotionMode,
-    G3: MotionMode,
-    G4: NonModalCommand,
-    G20: UnitMode,
-    G21: UnitMode,
-    G28: NonModalCommand,
-    G30: NonModalCommand,
-    "G38.2": NonModalCommand,
-    "G38.3": NonModalCommand,
-    "G38.4": NonModalCommand,
-    "G38.5": NonModalCommand,
-    G90: DistanceMode,
-    G91: DistanceMode,
-    "G91.1": ArcDistanceMode,
-    G93: FeedRateMode,
-    G94: FeedRateMode
-};
+import {GCodeMap, GCodeType} from "./GCodeConstants";
 
 export default class GCodeParser {
     static parseLines(lines) {

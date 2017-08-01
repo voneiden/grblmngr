@@ -76,30 +76,27 @@ export default class GCodeParser {
 }
 
 function parseLines(lines) {
-    let results = new Array(lines.length);
-    let j = 0;
+    let results = [];
     let result;
     for (let i=0; i < lines.length; i++) {
         result = readCommandsRegex(lines[i]);
         if (result) {
-            j++;
-            results[j] = result;
+            results[results.length] = result;
         }
     }
-    results.length = j;
     return results;
 }
 
-const cleaner = /\s/g;
-const commandMatcher = /([GXYZF])+(\d+(?:\.\d+)?)/gi;
-function readCommandsRegex(line) {
+const commandMatcher = /([GXYZIJKF])+(\d+(?:\.\d+)?)/gi;
+export function readCommandsRegex(line) {
     // Get rid of whitespaces
-    let output = {};
-    line = line.replace(cleaner, "");
+
+    line = line.replace(/\s/g, "");
     let commands = line.match(commandMatcher);
     if (commands) {
+        let output = {};
         for (let i=0; i < commands.length; i++) {
-            commandToOutput(commands[i], output);
+            commandToOutput(commands[i].toUpperCase(), output);
         }
         return output;
     }
@@ -107,18 +104,21 @@ function readCommandsRegex(line) {
 }
 
 function commandToOutput(command, output) {
-    let key = command[0].toUpperCase();
-    switch (key) {
+    switch (command[0]) {
         case "G":
-            command = command.toUpperCase();
-            let type = GCodeType[command];
-            output[type] = GCodeMap[command];
+            output[GCodeType[command]] = GCodeMap[command];
             return;
         case "F":
         case "X":
         case "Y":
+        case "I":
+        case "J":
+        case "K":
         case "Z":
-            output[key] = command.slice(1);
+            output[command[0]] = command.slice(1);
+            return;
+
+        default:
             return;
     }
 }

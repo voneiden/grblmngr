@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components'
 import {observable, action, computed} from "mobx";
 import {observer} from 'mobx-react';
+import connectionStore from '../stores/connectionStore';
 import ConnectionTab from './tabs/SerialConnectionTab';
 import Renderer from './renderer/Renderer';
 import StatusTab from './tabs/StatusTab';
@@ -57,6 +58,7 @@ const TabRow = styled((props) => (<div className={ props.className }>{ props.chi
   justify-content: center;
   align-items: center;
   border-bottom: 1px solid black;
+  flex-shrink: 0;
 `;
 
 const SideTopContainer = styled(observer((props) => (
@@ -69,6 +71,8 @@ const SideTopContainer = styled(observer((props) => (
 )))`
     flex-grow: 1;
     background-color: yellow;
+    display: flex;
+    flex-direction: column;
 `;
 
 
@@ -78,6 +82,7 @@ const SideBottomContainer = styled((props) => (
     </div>
 ))`
     flex-grow: 0;
+    flex-shrink: 0;
     background-color: magenta;
     height: 400px;
 `;
@@ -108,12 +113,24 @@ const MainPanel = styled((props) => (
 `;
 
 
-const Workspace = styled((props) => (
-    <div className={ props.className }>
-        <SidePanel/>
-        <MainPanel/>
-    </div>
-))`
+class BaseWorkspace extends React.Component {
+    componentWillMount() {
+        window.onbeforeunload = () => connectionStore.close();
+    }
+    componentWillUnmount() {
+        console.warn("Will unmount");
+    }
+    render() {
+        return (
+            <div className={ this.props.className }>
+                <SidePanel/>
+                <MainPanel/>
+            </div>
+        );
+    }
+}
+
+const Workspace = styled(BaseWorkspace)`
   background-color: red;
   display: flex;
   width: 100%;

@@ -9,10 +9,12 @@ try {
 
 class ConnectionStore {
     serialport = null;
-    connected = false;
-    ports = null;
-    port = null;
+    @observable connected = false;
+    @observable ports = null;
+    @observable port = null;
+    @observable history = [];
     portInfo = null;
+
 
     constructor() {
         if (Electron && Electron.remote) {
@@ -22,11 +24,10 @@ class ConnectionStore {
     }
 
     setPorts(ports) {
-        console.log("Set ports to ", ports),
         this.ports = ports;
-        console.log(this.ports);
     }
 
+    @action
     refreshPorts() {
         this.ports = null;
         this.serialport.list().then((ports) => this.setPorts(ports));
@@ -34,26 +35,45 @@ class ConnectionStore {
 
 
     get activePortName() {
-        console.log(this.connected, !this.connected, this.connected == false, this.connected === false);
         if (!this.connected) { return "Not connected"; }
         return this.connected;
     }
-    /*
-    listPorts() {
-        SerialPort.list().then((portinfo) => {
-            this.portInfo = portinfo;
-        });
+
+    @action
+    open(path) {
+        this.port = new this.serialport(path, {baudRate: 115200}, (arg1, arg2) => this.handleOpen(arg1, arg2));
+        const parser = this.port.pipe(new this.serialport.parsers.Readline({delimiter: '\r'}));
+        parser.on('data', (data) => this.handleData(data));
     }
-    */
+
+    @action
+    close() {
+        console.log("Port close action called");
+        if (this.port) {
+            this.port.close();
+            this.port = null;
+        }
+        this.history.clear();
+    }
+
+    writeln(line) {
+        if (this.port) {
+            this.port.write(`${line}\r`)
+        }
+    }
+
+    handleOpen(arg1, arg2) {
+        console.log("Open", arg1, arg2);
+
+    }
+
+    @action
+    handleData(data) {
+        this.history.push(data);
+        console.log("Recv:", data);
+    }
 
 }
-decorate(ConnectionStore, {
-    connected: observable,
-    port: observable,
-    ports: observable,
-    setPorts: action,
-    refreshPorts: action
-});
 
 
 export default new ConnectionStore();

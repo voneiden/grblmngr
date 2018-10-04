@@ -20,15 +20,31 @@ class EditorStore {
 
 const editorStore = new EditorStore();
 
-
+const syntax_attribute = /^[XYZIJKRF]$/;
+const syntax_command = /^[G\d]+$/;
+const syntax_number = /^[\d.\-]+$/;
+const syntaxHilight = (item) => {
+    if (syntax_attribute.exec(item)) {
+        return <span className="editor--attr">{ item }</span>
+    } else if (syntax_number.exec(item)) {
+        return <span className="editor-num">{ item }</span>
+    } else if (syntax_command.exec(item)) {
+        return <span className="editor-cmd">{ item }</span>
+    } else {
+        return item;
+    }
+};
 
 @observer
 class Line extends React.Component {
     render() {
+        let content = p.lines[this.props.number];
+        let split = content.split(/([XYZIJKRF]|[G\d]+|[\d.\-]+)/);
+        content = split.map((item) => syntaxHilight(item));
         return (
             <div className={ this.props.className }>
                 <span className="editor--ln">{ `${this.props.number}`.padStart(p.lines.length.toString().length, " ") }</span>
-                <span className="editor--code">{p.lines[this.props.number]}</span>
+                <span className="editor--code">{ content }</span>
             </div>
         );
     }
@@ -62,7 +78,16 @@ Line = styled(Line)`
     height: ${editorStore.rowHeight}px;
     white-space: pre-wrap;
   }
-`
+  .editor--attr {
+    color: red;
+  }
+  .editor-cmd {
+    color: lime;
+  }
+  .editor-num {
+    color: purple;
+  }
+`;
 
 
 @observer

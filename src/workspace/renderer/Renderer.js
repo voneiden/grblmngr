@@ -31,6 +31,9 @@ class Renderer extends React.Component {
     componentDidMount() {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, this.canvas.offsetWidth / this.canvas.offsetHeight, 0.1, 1000 );
+        const ratio = this.canvas.offsetWidth / this.canvas.offsetHeight;
+        this.camera = new THREE.OrthographicCamera( -100, 100, 100, -100, 1, 1000 );
+        this.camera.zoom = 2;
         this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
         this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
         let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );

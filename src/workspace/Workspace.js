@@ -6,6 +6,7 @@ import connectionStore from '../stores/connectionStore';
 import ConnectionTab from './tabs/SerialConnectionTab';
 import Renderer from './renderer/Renderer';
 import StatusTab from './tabs/StatusTab';
+import Editor from './tabs/Editor';
 
 class TabStore {
     @observable
@@ -14,7 +15,7 @@ class TabStore {
 
     tabs = {
         'Serial': <ConnectionTab/>,
-        'File': null,
+        'File': <Editor/>,
         'Autolevel': null,
     };
 

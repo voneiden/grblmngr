@@ -10,6 +10,8 @@
     "object-assign": "4.1.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "prop-types": "15.6.2",
+    "react-virtualized": "9.20.1",
     "serialport": "^6.2.2",
     "styled-components": "3.4.9",
     "three": "0.97.0"

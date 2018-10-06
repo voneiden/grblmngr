@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
 import styled from 'styled-components'
-import {observable, action, computed} from "mobx";
+import {observable, action, computed, autorun} from "mobx";
 import {observer} from 'mobx-react';
-import gcodeStore from '../../stores/gcodeStore';
+import grblStore from '../../stores/grblStore';
 import {p, Motion} from '../../stores/gcodeStore';
 import autoBind from 'auto-bind';
 
@@ -12,19 +12,48 @@ class RenderStore {
     @observable GeometryToLineMap = observable.map();
     @observable zoom = 20;
 
-    majorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x003300 });
-    minorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x001100 });
+    majorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x003300, depthTest: false });
+    minorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x001100, depthTest: false });
     solidMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     dashedMaterial = new THREE.LineDashedMaterial( { color: 0xffff00,  dashSize: 1, gapSize: 0.5 });
+    millMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, depthTest: false });
 
+    renderer = null;
+    camera = null;
     scene = new THREE.Scene();
 
-    drawLine(c11, c12, c21, c22, depth, material) { // TODO plane support
+    mill = new THREE.Group();
+    millRunner = null;
+
+    constructor() {
+        // TODO do multiple scenes, and call renderer.clearDepth() to make stuff come out in correct order
+        // minor grid
+        // major grid
+        // mill
+        // gcode
+
+        this.mill.add(this.drawLine(-1, 0, 1, 0, 10, this.millMaterial, 1));
+        this.mill.add(this.drawLine(0, -1, 0, 1, 10, this.millMaterial, 1));
+
+        this.scene.add(this.mill);
+
+        this.millRunner = autorun(() => {
+            this.mill.position.set(grblStore.WPos.x, grblStore.WPos.y, grblStore.WPos.z);
+            if (this.renderer) {
+                this.renderer.render( this.scene, this.camera );
+            }
+        })
+
+    }
+
+    drawLine(c11, c12, c21, c22, depth, material, renderOrder=0) { // TODO plane support
         let lineGeometry = new THREE.Geometry();
         lineGeometry.vertices.push(new THREE.Vector3(c11, c12, depth));
         lineGeometry.vertices.push(new THREE.Vector3(c21, c22, depth));
         let line = new THREE.Line(lineGeometry, material);
+        line.renderOrder = renderOrder;
         line.computeLineDistances();
+
         return line;
     }
 
@@ -47,15 +76,15 @@ class RenderStore {
         for (let w=widthStart; w <= widthEnd;  w += major) {
             const max = Math.min(w + major, widthEnd);
             for (let wm=w + minor; wm < max; wm += minor) {
-                this.gridScene.add(this.drawLine(wm, heightStart, wm, heightEnd, -100, this.minorGridMaterial));
+                this.gridScene.add(this.drawLine(wm, heightStart, wm, heightEnd, 0, this.minorGridMaterial, -2));
             }
-            this.gridScene.add(this.drawLine(w, heightStart, w, heightEnd, -90, this.majorGridMaterial));
+            this.gridScene.add(this.drawLine(w, heightStart, w, heightEnd, 0, this.majorGridMaterial, -1));
         }
         for (let h=heightStart; h <= heightEnd; h+= major) {
             for (let hm=h + minor; hm < h + major; hm += minor) {
-                this.gridScene.add(this.drawLine(widthStart, hm, widthEnd, hm, -100, this.minorGridMaterial));
+                this.gridScene.add(this.drawLine(widthStart, hm, widthEnd, hm, 0, this.minorGridMaterial, -2));
             }
-            this.gridScene.add(this.drawLine(widthStart, h, widthEnd, h, -90, this.majorGridMaterial));
+            this.gridScene.add(this.drawLine(widthStart, h, widthEnd, h, 0, this.majorGridMaterial, -1));
         }
         this.scene.add(this.gridScene);
     }
@@ -154,24 +183,21 @@ class Renderer extends React.Component {
         super(props);
         this.container = null;
         this.canvas = null;
-        this.scene = null;
-        this.camera = null;
-        this.renderer = null;
         this.handleResize = this.handleResize.bind(this);
     }
 
     handleResize() {
-        if (this.container && this.renderer) {
+        if (this.container && renderStore.renderer) {
             const width = this.container.offsetWidth;
             const height = this.container.offsetHeight;
-            this.renderer.setSize(width, height);
-            this.camera.left = -width;
-            this.camera.right = width;
-            this.camera.top = height;
-            this.camera.bottom = -height;
+            renderStore.renderer.setSize(width, height);
+            renderStore.camera.left = -width;
+            renderStore.camera.right = width;
+            renderStore.camera.top = height;
+            renderStore.camera.bottom = -height;
             renderStore.createGrid(-width, width, height, -height);
-            this.camera.updateProjectionMatrix();
-            this.renderer.render( renderStore.scene, this.camera );
+            renderStore.camera.updateProjectionMatrix();
+            renderStore.renderer.render( renderStore.scene, renderStore.camera );
         }
     }
 
@@ -179,11 +205,11 @@ class Renderer extends React.Component {
         const width = this.canvas.offsetWidth;
         const height = this.canvas.offsetHeight;
         // TODO select z, near and far with some logic depending on the gcode
-        this.camera = new THREE.OrthographicCamera( -width, width, height, -height, 0, 1000 );
-        this.camera.position.z = 100;
-        this.camera.zoom = 20;
-        this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
-        this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+        renderStore.camera = new THREE.OrthographicCamera( -width, width, height, -height, 0, 1000 );
+        renderStore.camera.position.z = 100;
+        renderStore.camera.zoom = 20;
+        renderStore.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
+        renderStore.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
 
         let segmentActions = [];

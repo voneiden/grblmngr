@@ -1,19 +1,25 @@
-import {decorate, observable, action} from "mobx";
+import {decorate, observable, action} from 'mobx';
+import grblStore from './grblStore';
 
 let Electron = null;
 try {
     Electron = require('electron');
 } catch (e) {
-    console.log("CAttthcy");
+    console.error("Electron context is not available, unable to start app");
 }
+
+const handshakeRegex = /Grbl (.+) \['\$' for help]/;
 
 class ConnectionStore {
     serialport = null;
+    @observable grblVersion = null;
     @observable connected = false;
     @observable ports = null;
     @observable port = null;
     @observable history = [];
     portInfo = null;
+    @observable statusQueryInProgress = false;
+    @observable statusQueryTimer = null;
 
 
     constructor() {
@@ -42,7 +48,7 @@ class ConnectionStore {
     @action
     open(path) {
         this.port = new this.serialport(path, {baudRate: 115200}, (arg1, arg2) => this.handleOpen(arg1, arg2));
-        const parser = this.port.pipe(new this.serialport.parsers.Readline({delimiter: '\r'}));
+        const parser = this.port.pipe(new this.serialport.parsers.Readline({delimiter: '\r\n'}));
         parser.on('data', (data) => this.handleData(data));
     }
 
@@ -52,6 +58,7 @@ class ConnectionStore {
         if (this.port) {
             this.port.close();
             this.port = null;
+            this.grblVersion = null;
         }
         this.history.clear();
     }
@@ -67,10 +74,47 @@ class ConnectionStore {
 
     }
 
+    queryStatus() {
+        if (this.statusQueryTimer) {
+            window.clearTimeout(this.statusQueryTimer);
+            this.statusQueryTimer = null;
+        }
+        if (this.port) {
+            if (!this.statusQueryInProgress) {
+                this.statusQueryInProgress = true;
+                console.log("Made status query");
+                this.port.write("?");
+            } else {
+                console.error("Status query already in progress");
+            }
+        }
+    }
+
     @action
     handleData(data) {
-        this.history.push(data);
-        console.log("Recv:", data);
+        if (!this.grblVersion) {
+            let handshake = handshakeRegex.exec(data);
+            if (handshake) {
+                this.grblVersion = handshake[1];
+                this.history.push(`Connected to grbl version ${this.grblVersion}`);
+                this.queryStatus();
+            } else {
+                console.log("Bad data", data);
+            }
+        } else {
+            if (data[0] === '<') {
+                if (this.statusQueryInProgress && !this.statusQueryTimer) {
+                    this.statusQueryInProgress = false;
+                    this.statusQueryTimer = window.setTimeout(() => this.queryStatus(), 200);
+                }
+                grblStore.parseStatus(data);
+            } else {
+                console.log("Data[0] is", data[0], data.charCodeAt(0));
+
+                this.history.push(data);
+            }
+            console.log("Recv:", data);
+        }
     }
 
 }

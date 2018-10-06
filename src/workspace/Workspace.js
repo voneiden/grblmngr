@@ -6,6 +6,7 @@ import connectionStore from '../stores/connectionStore';
 import ConnectionTab from './tabs/SerialConnectionTab';
 import Renderer from './renderer/Renderer';
 import StatusTab from './tabs/StatusTab';
+import StatusBar from './status/StatusBar';
 import Editor from './tabs/Editor';
 
 class TabStore {
@@ -71,7 +72,6 @@ const SideTopContainer = styled(observer((props) => (
     </div>
 )))`
     flex-grow: 1;
-    background-color: yellow;
     display: flex;
     flex-direction: column;
 `;
@@ -97,7 +97,6 @@ const SidePanel = styled((props) => (
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background-color: blue;
   width: 400px;
   
 `;
@@ -105,12 +104,14 @@ const SidePanel = styled((props) => (
 
 const MainPanel = styled((props) => (
     <div className={ props.className }>
+        <StatusBar/>
         <Renderer/>
     </div>
 ))`
   background-color: lime;
   flex-grow: 1;
   display: flex;
+  flex-direction: column;
 `;
 
 
@@ -132,7 +133,6 @@ class BaseWorkspace extends React.Component {
 }
 
 const Workspace = styled(BaseWorkspace)`
-  background-color: red;
   display: flex;
   width: 100%;
   height: 100%;

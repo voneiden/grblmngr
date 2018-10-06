@@ -9,6 +9,12 @@ import { p } from '../../stores/gcodeStore';
 import { List } from 'react-virtualized';
 import autoBind from 'auto-bind';
 
+import AceEditor from 'react-ace';
+
+import 'brace/mode/gcode';
+import 'brace/theme/merbivore';
+
+
 class EditorStore {
     @observable scrollTop = 0;
     @observable rowHeight = 20;
@@ -93,34 +99,33 @@ Line = styled(Line)`
 @observer
 class Editor extends React.Component {
     constructor(props) {
-        super(props)
-        this.state = {
-            containerWidth: 100,
-            containerHeight: 100,
-        }
+        super(props);
         autoBind(this);
+        this.state = {
+            width: 400,
+            height: 400,
+        }
     }
     componentDidMount() {
-        this.setState({
-            containerWidth: this.container.offsetWidth,
-            containerHeight: this.container.offsetHeight,
-        })
+        if (this.container) {
+            this.setState({
+                width: this.container.offsetWidth,
+                height: this.container.offsetHeight,
+            })
+        }
     }
 
-    handleScroll(e) {
-        editorStore.setScrollTop(e.scrollTop);
-    }
     render() {
         return (
-            <div className={ this.props.className } ref={ (r) => this.container = r}>
-                <List
-                    width={ this.state.containerWidth }
-                    height={ this.state.containerHeight }
-                    rowCount={ p.lines.length }
-                    rowRenderer={ rowRenderer }
-                    rowHeight={ editorStore.rowHeight }
-                    onScroll={ (e) => this.handleScroll(e) }
-                    scrollTop={ editorStore.scrollTop }
+            <div ref={ (r) => this.container = r } id="editor--container" className={ this.props.className }>
+                <AceEditor
+                    mode="gcode"
+                    theme="merbivore"
+                    name="editor--ace"
+                    value={p.content}
+                    wrapEnabled={ true }
+                    width={ this.state.width }
+                    height={ this.state.height }
                 />
             </div>
         )
@@ -130,9 +135,4 @@ class Editor extends React.Component {
 export default styled(Editor)`
   background-color: black;
   flex-grow: 1;
-  display: flex;
-  font-family: "Lucida Console", Monaco, monospace;
-  textarea {
-    flex-grow: 1;
-  }
 `;

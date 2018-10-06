@@ -198,12 +198,13 @@ class StateMachine {
 class Program {
     @observable
     lines = [];
+    content = null;
 
     @observable
     actions = [];
 
     parseLines(lines) {
-        let start = performance.now();
+        let start = Date.now();
         this.lines.replace(lines);
         let state = new StateMachine();
         for (let line of lines) {
@@ -214,10 +215,11 @@ class Program {
             state.latch();
             this.actions.push(state.getState());
         }
-        console.log("Time taken", performance.now() - start, "ms");
+        console.log("Time taken", Date.now() - start, "ms");
     }
 
     parseStream(stream) {
+        this.content = stream;
         this.parseLines(stream.split(/\r?\n/));
     }
 }

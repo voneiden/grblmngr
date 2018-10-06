@@ -198,7 +198,7 @@ class Renderer extends React.Component {
         }
         renderStore.createMotionSegment(previousMotion, segmentActions);
         this.handleResize();
-        console.log("Startup completed in ", performance.now()- window.startuptime, "ms");
+        console.log("Startup completed in ", Date.now()- window.startuptime, "ms");
         window.addEventListener('resize', this.handleResize);
     }
 

@@ -10,19 +10,65 @@ import autoBind from 'auto-bind';
 class RenderStore {
     @observable lineToGeometryMap = observable.map();
     @observable GeometryToLineMap = observable.map();
+    @observable zoom = 20;
 
+    majorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x003300 });
+    minorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x001100 });
     solidMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     dashedMaterial = new THREE.LineDashedMaterial( { color: 0xffff00,  dashSize: 1, gapSize: 0.5 });
 
     scene = new THREE.Scene();
 
+    drawLine(c11, c12, c21, c22, depth, material) { // TODO plane support
+        let lineGeometry = new THREE.Geometry();
+        lineGeometry.vertices.push(new THREE.Vector3(c11, c12, depth));
+        lineGeometry.vertices.push(new THREE.Vector3(c21, c22, depth));
+        let line = new THREE.Line(lineGeometry, material);
+        line.computeLineDistances();
+        return line;
+    }
+
+    createGrid(left, right, top, bottom) {
+        if (this.gridScene) {
+            this.scene.remove(this.gridScene);
+        }
+        this.gridScene = new THREE.Scene();
+        // Metric grid as an exercise, only XY-plane
+        // Major tick every 10 mm
+        // Minor tick every 1 mm
+        const zoom = this.zoom;
+        let major = 10;
+        let minor = 1;
+
+        let widthStart = Math.floor(Math.floor(left/major/zoom) * major);
+        let widthEnd = Math.ceil(Math.ceil(right/major/zoom) * major);
+        let heightStart = Math.floor(Math.floor(bottom/major/zoom) * major);
+        let heightEnd = Math.ceil(Math.ceil(top/major/zoom) * major);
+        for (let w=widthStart; w <= widthEnd;  w += major) {
+            const max = Math.min(w + major, widthEnd);
+            for (let wm=w + minor; wm < max; wm += minor) {
+                this.gridScene.add(this.drawLine(wm, heightStart, wm, heightEnd, -100, this.minorGridMaterial));
+            }
+            this.gridScene.add(this.drawLine(w, heightStart, w, heightEnd, -90, this.majorGridMaterial));
+        }
+        for (let h=heightStart; h <= heightEnd; h+= major) {
+            for (let hm=h + minor; hm < h + major; hm += minor) {
+                this.gridScene.add(this.drawLine(widthStart, hm, widthEnd, hm, -100, this.minorGridMaterial));
+            }
+            this.gridScene.add(this.drawLine(widthStart, h, widthEnd, h, -90, this.majorGridMaterial));
+        }
+        this.scene.add(this.gridScene);
+    }
+
+
     get lastPosition() {
         if (this.scene.children.length) {
             let lastChild = this.scene.children[this.scene.children.length - 1];
-            return lastChild.geometry.vertices[lastChild.geometry.vertices.length - 1];
-        } else {
-            return new THREE.Vector3(0, 0, 0);
+            if (lastChild.geometry) {
+                return lastChild.geometry.vertices[lastChild.geometry.vertices.length - 1];
+            }
         }
+        return new THREE.Vector3(0, 0, 0);
     }
 
     createMoveSegment(actions, material=null) {
@@ -116,25 +162,29 @@ class Renderer extends React.Component {
 
     handleResize() {
         if (this.container && this.renderer) {
-            let width = this.container.offsetWidth;
-            let height = this.container.offsetHeight;
+            const width = this.container.offsetWidth;
+            const height = this.container.offsetHeight;
             this.renderer.setSize(width, height);
-            this.camera.aspect = width/height;
+            this.camera.left = -width;
+            this.camera.right = width;
+            this.camera.top = height;
+            this.camera.bottom = -height;
+            renderStore.createGrid(-width, width, height, -height);
             this.camera.updateProjectionMatrix();
             this.renderer.render( renderStore.scene, this.camera );
         }
     }
 
     componentDidMount() {
-        this.camera = new THREE.PerspectiveCamera( 75, this.canvas.offsetWidth / this.canvas.offsetHeight, 0.1, 1000 );
-        const ratio = this.canvas.offsetWidth / this.canvas.offsetHeight;
-        this.camera = new THREE.OrthographicCamera( -100 * ratio, 100*ratio, 100, -100, 1, 1000 );
-        this.camera.zoom = 3;
+        const width = this.canvas.offsetWidth;
+        const height = this.canvas.offsetHeight;
+        // TODO select z, near and far with some logic depending on the gcode
+        this.camera = new THREE.OrthographicCamera( -width, width, height, -height, 0, 1000 );
+        this.camera.position.z = 100;
+        this.camera.zoom = 20;
         this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
         this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-        let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-        let last = {};
-        console.log("P actions", p.actions);
+
 
         let segmentActions = [];
         let previousMotion = null;
@@ -147,8 +197,6 @@ class Renderer extends React.Component {
             segmentActions.push(action);
         }
         renderStore.createMotionSegment(previousMotion, segmentActions);
-
-        this.camera.position.z = 30;
         this.handleResize();
         console.log("Startup completed in ", performance.now()- window.startuptime, "ms");
         window.addEventListener('resize', this.handleResize);

@@ -20,8 +20,16 @@ export const Motion = Enum(
  * @property RELATIVE
  * @type {*|void}
  */
-const CoordinateMode = Enum(
+export const CoordinateMode = Enum(
     "ABSOLUTE", "RELATIVE"
+);
+
+/**
+ * @property METRIC
+ * @property IMPERIAL
+ */
+export const UnitMode = Enum(
+    "METRIC", "IMPERIAL"
 );
 
 console.log(Motion);
@@ -31,6 +39,8 @@ const GMap = {
     G1: Motion.MOVE,
     G2: Motion.CW_ARC,
     G3: Motion.CCW_ARC,
+    G20: UnitMode.IMPERIAL,
+    G21: UnitMode.METRIC,
     G90: CoordinateMode.ABSOLUTE,
     G91: CoordinateMode.RELATIVE
 };
@@ -44,6 +54,10 @@ class StateMachine {
             X: 0,
             Y: 0,
             Z: 0,
+            xMin: 0,
+            xMax: 0,
+            yMin: 0,
+            yMax: 0
         }
     }
 
@@ -116,7 +130,9 @@ class StateMachine {
         if (this.buffer.coordinateMode) {
             this.state.coordinateMode = this.buffer.coordinateMode;
         }
-
+        if (this.buffer.unitMode) {
+            this.state.unitMode = this.buffer.unitMode;
+        }
 
         switch (this.state.motion) {
             case Motion.RAPID:
@@ -152,6 +168,10 @@ class StateMachine {
                 case CoordinateMode.RELATIVE:
                     this.buffer.coordinateMode = word;
                     break;
+                case UnitMode.IMPERIAL:
+                case UnitMode.METRIC:
+                    this.buffer.unitMode = word;
+                break;
                 default:
                     console.warn("Unknown word", word, match);
             }

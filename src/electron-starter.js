@@ -7,7 +7,7 @@ function createWindow () {
     mainWindow.maximize();
     global.serialport = serialport;
     //mainWindow.loadFile('index.html')
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL('http://localhost:8080');
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
 

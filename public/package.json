@@ -1,0 +1,17 @@
+{
+  "name": "grblmngr",
+  "main": "./electron-starter.js",
+  "author": "Matti Eiden",
+  "description": "Grbl Manager",
+  "version": "0.0.9",
+  "dependencies": {
+    "serialport":"6.2.2"
+  },
+  "devDependencies": {
+    "electron-builder": "20.28.4"
+  },
+  "scripts": {
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  }
+}

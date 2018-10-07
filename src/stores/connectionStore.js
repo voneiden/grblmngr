@@ -5,7 +5,7 @@ let Electron = null;
 try {
     Electron = require('electron');
 } catch (e) {
-    console.error("Electron context is not available, unable to start app");
+    console.error("Electron context is not available, unable to start app", e);
 }
 
 const handshakeRegex = /Grbl (.+) \['\$' for help]/;

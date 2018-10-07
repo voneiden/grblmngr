@@ -1,0 +1,9 @@
+[package]
+name = "assembly"
+version = "0.1.0"
+authors = ["Matti Eiden <snaipperi@gmail.com>"]
+
+[dependencies]
+
+[lib]
+crate-type = ["cdylib"]

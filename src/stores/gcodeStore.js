@@ -203,18 +203,23 @@ class Program {
     @observable
     actions = [];
 
+    @action
     parseLines(lines) {
         let start = Date.now();
         this.lines.replace(lines);
         let state = new StateMachine();
+        let actions = [];
         for (let line of lines) {
             let match;
             while (match = gregex.exec(line)) {
                 state.prepare(...match);
             }
             state.latch();
-            this.actions.push(state.getState());
+            actions.push(state.getState());
         }
+        console.log("OK");
+        this.actions = observable.array(actions, { deep: false });
+        console.log("REPLACED");
         console.log("Time taken", Date.now() - start, "ms");
     }
 

@@ -39,11 +39,15 @@ class RenderStore {
 
         this.millRunner = autorun(() => {
             this.mill.position.set(grblStore.WPos.x, grblStore.WPos.y, grblStore.WPos.z);
-            if (this.renderer) {
-                this.renderer.render( this.scene, this.camera );
-            }
-        })
+            this.doRender();
+        });
+        autoBind(this);
+    }
 
+    doRender() {
+        if (this.renderer) {
+            this.renderer.render( this.scene, this.camera );
+        }
     }
 
     drawLine(c11, c12, c21, c22, depth, material, renderOrder=0) { // TODO plane support
@@ -183,7 +187,8 @@ class Renderer extends React.Component {
         super(props);
         this.container = null;
         this.canvas = null;
-        this.handleResize = this.handleResize.bind(this);
+        this.panning = false;
+        autoBind(this);
     }
 
     handleResize() {
@@ -198,6 +203,29 @@ class Renderer extends React.Component {
             renderStore.createGrid(-width, width, height, -height);
             renderStore.camera.updateProjectionMatrix();
             renderStore.renderer.render( renderStore.scene, renderStore.camera );
+        }
+    }
+
+    handleMouseDown(e) {
+        if (e.button === 1) {
+            this.panning = true;
+        }
+    }
+    handleMouseMove(e) {
+        if (this.panning) {
+            let dx = e.clientX - this.mouseX;
+            let dy = e.clientY - this.mouseY;
+            let pos = renderStore.camera.position;
+            pos.setX(pos.x - dx / 5); // Todo appropriate factor based on zoom
+            pos.setY(pos.y + dy / 5);
+            renderStore.doRender();
+        }
+        this.mouseX = e.clientX;
+        this.mouseY = e.clientY;
+    }
+    handleMouseUp(e) {
+        if (e.button === 1) {
+            this.panning = false;
         }
     }
 
@@ -226,6 +254,8 @@ class Renderer extends React.Component {
         this.handleResize();
         console.log("Startup completed in ", Date.now()- window.startuptime, "ms");
         window.addEventListener('resize', this.handleResize);
+        window.addEventListener('mouseup', this.handleMouseUp);
+
     }
 
     componentWillUnmount() {
@@ -233,7 +263,11 @@ class Renderer extends React.Component {
     }
     render() {
         return (
-            <div className={ this.props.className } ref={(r) => this.container = r }>
+            <div
+                className={ this.props.className }
+                ref={(r) => this.container = r }
+                onMouseDown={ (e) => this.handleMouseDown(e) }
+                onMouseMove={ (e) => this.handleMouseMove(e) }>
                 <canvas ref={(r) => this.canvas = r}/>
             </div>
         )

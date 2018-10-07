@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import {observable, action, computed} from "mobx";
 import {observer} from 'mobx-react';
 import connectionStore from '../stores/connectionStore';
-import ConnectionTab from './tabs/SerialConnectionTab';
+import SerialConnectionTab from './tabs/SerialConnectionTab';
 import Renderer from './renderer/Renderer';
 import StatusTab from './tabs/StatusTab';
 import StatusBar from './status/StatusBar';
@@ -15,7 +15,7 @@ class TabStore {
 
 
     tabs = {
-        'Serial': <ConnectionTab/>,
+        'Serial': <SerialConnectionTab/>,
         'File': <Editor/>,
         'Autolevel': null,
     };

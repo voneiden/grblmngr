@@ -48,6 +48,8 @@ class ConnectionStore {
     @action
     open(path) {
         this.port = new this.serialport(path, {baudRate: 115200}, (arg1, arg2) => this.handleOpen(arg1, arg2));
+        this.port.on('close', (reasons) => this.handleClose(reasons));
+        this.port.on('error', (error) => this.handleError(error));
         const parser = this.port.pipe(new this.serialport.parsers.Readline({delimiter: '\r\n'}));
         parser.on('data', (data) => this.handleData(data));
     }
@@ -56,7 +58,11 @@ class ConnectionStore {
     close() {
         console.log("Port close action called");
         if (this.port) {
-            this.port.close();
+            try {
+                this.port.close();
+            } catch (e) {
+                console.warn("Unable to close port");
+            }
             this.port = null;
             this.grblVersion = null;
         }
@@ -71,7 +77,16 @@ class ConnectionStore {
 
     handleOpen(arg1, arg2) {
         console.log("Open", arg1, arg2);
+    }
 
+    @action
+    handleClose(reasons) {
+        console.warn("Port closed for reasons", reasons);
+        this.port = null;
+    }
+
+    handleError(error) {
+        console.warn("Port error", error);
     }
 
     queryStatus() {

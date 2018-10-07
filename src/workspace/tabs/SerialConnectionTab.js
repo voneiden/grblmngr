@@ -6,7 +6,7 @@ import autoBind from 'auto-bind';
 
 const SerialNotAvailable = styled((props) => (
     <div>Serialport module is not available</div>
-));
+))``;
 
 @observer
 class PortSelectView extends React.Component {
@@ -115,7 +115,7 @@ class SerialConnectionTab extends React.Component {
         } else if (connectionStore.serialport) {
             return <PortSelectView/>
         } else {
-            return <SerialConnectionTab/>
+            return <SerialNotAvailable/>
         }
     }
 }

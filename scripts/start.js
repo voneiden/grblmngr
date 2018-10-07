@@ -11,6 +11,33 @@ process.on('unhandledRejection', err => {
   throw err;
 });
 
+const webpack = require('webpack');
+const WebpackDevServer = require('webpack-dev-server');
+const config = require('../config/webpack.config.dev');
+const targetIsElectron = process.env.ELECTRON_ENV === "1";
+const port = targetIsElectron ? 8080 : 8081;
+console.log('Starting the dev web server...');
+const path = require('path');
+
+const options = {
+    publicPath: config.output.publicPath,
+    hot: true,
+    inline: true,
+    contentBase: 'www',
+    stats: { colors: true }
+};
+
+const server = new WebpackDevServer(webpack(config), options);
+
+server.listen(port, 'localhost', function (err) {
+    if (err) {
+        console.log(err);
+    }
+    console.log('WebpackDevServer listening at localhost:', port);
+});
+
+/**
+
 // Ensure environment variables are read.
 require('../config/env');
 
@@ -105,3 +132,4 @@ choosePort(HOST, DEFAULT_PORT)
     }
     process.exit(1);
   });
+**/

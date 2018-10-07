@@ -133,7 +133,7 @@ class RenderStore {
             end.sub(center);
 
             let angle = Math.abs(start.angleTo(end));
-
+            console.log("Angle", angle);
             /** Full circle */
             if (angle === 0) {
                 angle = 2 * Math.PI;
@@ -144,6 +144,13 @@ class RenderStore {
              * positive for CCW motion
              */
             let N = start.clone().cross(end).normalize();
+            if (N.length() === 0) { // TODO handle different planes
+                if (action.arc.cw) {
+                    N.z = -1;
+                } else {
+                    N.z = 1;
+                }
+            }
             if (action.arc.cw) {
                 if (N.z > 0) {
                     N.negate();

@@ -74,11 +74,14 @@ class ConnectionStore {
         this.history.clear();
     }
 
-    writeln(line) {
+    write(line) {
         if (this.port) {
             this.lastSent = line;
-            this.port.write(`${line}\r`)
+            this.port.write(line)
         }
+    }
+    writeln(line) {
+        this.write(`${line}\r`);
     }
 
     handleOpen(arg1, arg2) {
@@ -89,6 +92,11 @@ class ConnectionStore {
     handleClose(reasons) {
         console.warn("Port closed for reasons", reasons);
         this.port = null;
+        this.statusQueryInProgress = false;
+        if (this.statusQueryTimer) {
+            window.clearTimeout(this.statusQueryTimer);
+            this.statusQueryTimer = null;
+        }
     }
 
     handleError(error) {

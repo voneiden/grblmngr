@@ -126,6 +126,24 @@ class GrblStore {
         }
     }
 
+    pause() {
+        if (connectionStore.connected && this.machineState === MachineState.RUN) {
+            connectionStore.write('!');
+        }
+    }
+
+    resume() {
+        if (connectionStore.connected && this.machineState === MachineState.HOLD) {
+            connectionStore.write('~');
+        }
+    }
+
+    stop() {
+        if (connectionStore.connected) {
+            connectionStore.write('\x18')
+        }
+    }
+
     parseStatus(status) {
         // <Idle|MPos:0.000,0.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
         stateRegex.lastIndex = 0;

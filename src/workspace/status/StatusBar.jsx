@@ -25,7 +25,14 @@ class StatusBar extends React.Component {
                     <div>Z <span>{ grblStore.MPos.z }</span></div>
                 </div>
                 <div>
+                    <div>Machine state</div>
+                    <div> { grblStore.machineState.toString() }</div>
+                </div>
+                <div>
                     <div onClick={ () => grblStore.run() }>Run program</div>
+                    <div onClick={ () => grblStore.pause() }>Pause program</div>
+                    <div onClick={ () => grblStore.resume() }>Resume program</div>
+                    <div onClick={ () => grblStore.stop() }>STOP program</div>
                 </div>
             </div>
         )
@@ -36,6 +43,7 @@ StatusBar = styled(StatusBar)`
     flex-basis: 75px;
     flex-shrink: 0;
     flex-grow: 0;
+    display: flex;
 `;
 
 export default StatusBar;

@@ -147,7 +147,7 @@ class ConnectionStore {
 
                 this.history.push(data);
             }
-            //console.log("Recv:", data);
+            console.log("Recv:", data);
         }
     }
 

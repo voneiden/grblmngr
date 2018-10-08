@@ -13,16 +13,16 @@ class StatusBar extends React.Component {
         return (
             <div className={ this.props.className }>
                 <div>
-                    <div>WPos</div>
-                    <div>X <span>{ grblStore.WPos.x }</span></div>
-                    <div>Y <span>{ grblStore.WPos.y }</span></div>
-                    <div>Z <span>{ grblStore.WPos.z }</span></div>
-                </div>
-                <div>
                     <div>MPos</div>
                     <div>X <span>{ grblStore.MPos.x }</span></div>
                     <div>Y <span>{ grblStore.MPos.y }</span></div>
                     <div>Z <span>{ grblStore.MPos.z }</span></div>
+                </div>
+                <div>
+                    <div>WPos</div>
+                    <div>X <span>{ grblStore.WPos.x }</span> <span onClick={ () => grblStore.zeroX() }>Zero</span></div>
+                    <div>Y <span>{ grblStore.WPos.y }</span> <span onClick={ () => grblStore.zeroY() }>Zero</span></div>
+                    <div>Z <span>{ grblStore.WPos.z }</span> <span onClick={ () => grblStore.zeroZ() }>Zero</span></div>
                 </div>
                 <div>
                     <div>Machine state</div>

@@ -96,9 +96,15 @@ class GrblStore {
     setWCO(x, y, z) {
         let WCO = this.WCO;
         if (WCO.x !== x || WCO.y !== y || WCO.z !== z) {
+            console.log("WCO changed");
             this.WCO.x = x;
             this.WCO.y = y;
             this.WCO.z = z;
+            this.WPos.x = (parseFloat(this.MPos.x) - parseFloat(x)).toFixed(3);
+            this.WPos.y = (parseFloat(this.MPos.y) - parseFloat(y)).toFixed(3);
+            this.WPos.z = (parseFloat(this.MPos.z) - parseFloat(z)).toFixed(3);
+        } else {
+            console.log("WCO not changed", WCO.x, WCO.y, WCO.z, x, y, z);
         }
     }
 
@@ -141,6 +147,24 @@ class GrblStore {
     stop() {
         if (connectionStore.connected) {
             connectionStore.write('\x18')
+        }
+    }
+
+    zeroX() {
+        if (connectionStore.connected) {
+            connectionStore.writeln(`G10 L2 P1 X${this.MPos.x}`);
+        }
+    }
+
+    zeroY() {
+        if (connectionStore.connected) {
+            connectionStore.writeln(`G10 L2 P1 Y${this.MPos.y}`);
+        }
+    }
+
+    zeroZ() {
+        if (connectionStore.connected) {
+            connectionStore.writeln(`G10 L2 P1 Z${this.MPos.z}`);
         }
     }
 

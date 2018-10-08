@@ -198,6 +198,8 @@ class StateMachine {
 class Program {
     @observable
     lines = [];
+
+    @observable
     content = null;
 
     @observable
@@ -239,18 +241,56 @@ class Layer {
 
 class GcodeStore {
     @observable
-    layers = []
+    program = null;
 }
 
+const gcodeStore = new GcodeStore();
+export default gcodeStore;
 export const p = new Program();
-
-p.parseStream(`
+p.parseStream(`%
+(FCU engravings)
+(T7  D=0.58 CR=0 - ZMIN=-0.3 - flat end mill)
+G90 G94
+G17
+G21
+G28 G91 Z0
 G90
-F500
-G00 X0 Y0
-G03 Y-10 J-5
-G02 Y-20 J-5
-G01 X14 Y58.96
-G03 Y46.54 J-6.21`);
 
-export default new GcodeStore();
+(Non-text)
+M9
+T7 M6
+S24000 M3
+G54
+M8
+G0 X10.141 Y47.885
+Z15
+Z5
+G1 Z0.158 F83
+G3 X10.153 Y47.875 Z0.118 I3.859 J4.865 F83.3
+X10.185 Y47.85 Z0.1 I3.847 J4.875
+X19.749 Y50.401 Z-0.3 I3.815 J4.9
+X20.21 Y52.75 I-5.749 J2.349 F83
+Y52.763 I-6.21 J0.007
+X14 Y58.96 I-6.21 J-0.013
+Y46.54 J-6.21
+X19.749 Y50.401 J6.21
+X19.75 Y50.441 Z-0.283 I-0.054 J0.022
+X19.742 Y50.457 Z-0.242 I-0.055 J-0.018
+G0 Z5
+X14.281 Y58.733
+G1 Z0.158 F83
+G2 X14.297 Z0.118 I-0.281 J-5.983 F83.3
+X14.337 Y58.731 Z0.1 I-0.297 J-5.983
+X19.522 Y50.43 Z-0.3 I-0.337 J-5.981
+X14 Y46.76 I-5.522 J2.32 F83
+X13.987 I-0.007 J5.99
+X8.01 Y52.75 I0.013 J5.99
+X19.99 I5.99
+X19.522 Y50.43 I-5.99
+G3 X19.521 Y50.39 Z-0.283 I0.053 J-0.022
+X19.528 Y50.375 Z-0.242 I0.055 J0.018
+G0 Z15
+X47.988 Y38.481
+`);
+
+gcodeStore.program = p;

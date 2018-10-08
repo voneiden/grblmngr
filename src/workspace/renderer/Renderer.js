@@ -5,6 +5,7 @@ import {observable, action, computed, autorun} from "mobx";
 import {observer} from 'mobx-react';
 import grblStore from '../../stores/grblStore';
 import {p, Motion} from '../../stores/gcodeStore';
+import gcodeStore from '../../stores/gcodeStore';
 import autoBind from 'auto-bind';
 
 class RenderStore {
@@ -22,8 +23,14 @@ class RenderStore {
     camera = null;
     scene = new THREE.Scene();
 
+    grid = new THREE.Group();
+
     mill = new THREE.Group();
     millRunner = null;
+
+    program = new THREE.Group();
+    programRunner = null;
+
 
     constructor() {
         // TODO do multiple scenes, and call renderer.clearDepth() to make stuff come out in correct order
@@ -36,11 +43,37 @@ class RenderStore {
         this.mill.add(this.drawLine(0, -1, 0, 1, 10, this.millMaterial, 1));
 
         this.scene.add(this.mill);
+        this.scene.add(this.program);
 
         this.millRunner = autorun(() => {
             this.mill.position.set(grblStore.WPos.x, grblStore.WPos.y, grblStore.WPos.z);
             this.doRender();
         });
+
+        this.programRunner = autorun(() => {
+            const program = gcodeStore.program;
+            // Dumb cleanup
+            for (let i = this.program.children.length - 1; i >= 0; i--) {
+                let child = this.program.children[i];
+                this.program.remove(child);
+            }
+            if (program) {
+                let segmentActions = [];
+                let previousMotion = null;
+                const actions = program.actions;
+                for (let action of actions) {
+                    if (action.motion !== previousMotion) {
+                        this.createMotionSegment(previousMotion, segmentActions);
+                        previousMotion = action.motion;
+                        segmentActions = [];
+                    }
+                    segmentActions.push(action);
+                }
+                this.createMotionSegment(previousMotion, segmentActions);
+                this.doRender();
+            }
+        });
+
         autoBind(this);
     }
 
@@ -95,8 +128,8 @@ class RenderStore {
 
 
     get lastPosition() {
-        if (this.scene.children.length) {
-            let lastChild = this.scene.children[this.scene.children.length - 1];
+        if (this.program.children.length) {
+            let lastChild = this.program.children[this.program.children.length - 1];
             if (lastChild.geometry) {
                 return lastChild.geometry.vertices[lastChild.geometry.vertices.length - 1];
             }
@@ -121,7 +154,7 @@ class RenderStore {
         }
         let line = new THREE.Line( segmentGeometry, material ? material : this.solidMaterial );
         line.computeLineDistances();
-        this.scene.add(line);
+        this.program.add(line);
     }
     createArcSegment(actions) {
         for (let action of actions) {
@@ -174,7 +207,7 @@ class RenderStore {
             lineGeometry.vertices = curve.getPoints(10);
             let line = new THREE.Line(lineGeometry, this.solidMaterial);
             line.computeLineDistances();
-            this.scene.add(line);
+            this.program.add(line);
         }
     }
     createRapidSegment(actions) {
@@ -245,19 +278,6 @@ class Renderer extends React.Component {
         renderStore.camera.zoom = 20;
         renderStore.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
         renderStore.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-
-
-        let segmentActions = [];
-        let previousMotion = null;
-        for (let action of p.actions) {
-            if (action.motion !== previousMotion) {
-                renderStore.createMotionSegment(previousMotion, segmentActions);
-                previousMotion = action.motion;
-                segmentActions = [];
-            }
-            segmentActions.push(action);
-        }
-        renderStore.createMotionSegment(previousMotion, segmentActions);
         this.handleResize();
         console.log("Startup completed in ", Date.now()- window.startuptime, "ms");
         window.addEventListener('resize', this.handleResize);

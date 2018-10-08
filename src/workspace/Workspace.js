@@ -48,10 +48,11 @@ const TabItem = styled(observer((props) => (
   flex-shrink: 0;
   flex-basis: 1px;
   text-align: center;
+  cursor: pointer;
   :not(:last-child) {
-    border-right: 1px solid black;
+    border-right: 1px solid #ffff00;
   }
-  background-color: ${ props => props.selected ? "red" : "blue" }
+  background-color: ${ props => props.selected ? "#223300" : "black" }
   
 `;
 

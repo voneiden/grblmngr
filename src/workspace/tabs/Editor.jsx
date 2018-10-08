@@ -115,18 +115,35 @@ class Editor extends React.Component {
         }
     }
 
+    importFile(e) {
+        console.log("import", e, e.target.files);
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let contents = e.target.result;
+            p.parseStream(contents);
+        };
+        reader.readAsText(file);
+    }
+
     render() {
         return (
-            <div ref={ (r) => this.container = r } id="editor--container" className={ this.props.className }>
-                <AceEditor
-                    mode="gcode"
-                    theme="merbivore"
-                    name="editor--ace"
-                    value={p.content}
-                    wrapEnabled={ true }
-                    width={ this.state.width }
-                    height={ this.state.height }
-                />
+            <div className={ this.props.className }>
+                <div id="editor--file-controls">
+                    <label htmlFor="editor--file-picker">Import</label>
+                    <input onChange={ (e) => this.importFile(e) } id="editor--file-picker" type="file"/>
+                </div>
+                <div ref={ (r) => this.container = r } id="editor--container">
+                    <AceEditor
+                        mode="gcode"
+                        theme="merbivore"
+                        name="editor--ace"
+                        value={p.content}
+                        wrapEnabled={ true }
+                        width={ this.state.width }
+                        height={ this.state.height }
+                    />
+                </div>
             </div>
         )
     }
@@ -135,4 +152,17 @@ class Editor extends React.Component {
 export default styled(Editor)`
   background-color: black;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  #editor--file-controls {
+    display: flex;
+    background-color: #223300;
+    #editor--file-picker {
+      display: none;
+    }
+  }
+  
+  #editor--container {
+    flex-grow: 1;
+  }
 `;

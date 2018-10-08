@@ -1,4 +1,7 @@
 import {observable, action} from 'mobx';
+import connectionStore from './connectionStore';
+import grblStore from './grblStore';
+import gcodeStore from './gcodeStore';
 import Enum from 'es6-enum';
 import autoBind from 'auto-bind';
 /**
@@ -45,6 +48,9 @@ class GrblStore {
 
     @observable
     WCO = {x: '0', y: '0', z: '0'};
+
+    runLine = 0;
+    running = false;
 
     constructor() {
         autoBind(this);
@@ -96,11 +102,35 @@ class GrblStore {
         }
     }
 
+    run() {
+        if (connectionStore.connected && this.machineState === MachineState.IDLE) {
+            this.runLine = 0;
+            this.running = true;
+            this.runNextLine();
+        } else {
+            console.warn("Unable to run", connectionStore.connected, this.machineState);
+        }
+    }
+
+    runNextLine() {
+        if (connectionStore.connected && this.running) {
+            if (this.runLine < gcodeStore.program.lines.length) {
+                connectionStore.writeln(gcodeStore.program.lines[this.runLine]);
+                this.runLine += 1;
+            } else {
+                console.log("Program completed");
+                this.running = false;
+            }
+        } else {
+            console.error("Unable to run next line", connectionStore.connected, this.running);
+        }
+    }
+
     parseStatus(status) {
         // <Idle|MPos:0.000,0.000,0.000|FS:0,0|WCO:0.000,0.000,0.000>
         stateRegex.lastIndex = 0;
         stateDataRegex.lastIndex = 0;
-        console.log("Parse status", status);
+        //console.log("Parse status", status);
         let match = stateRegex.exec(status);
         if (!match) {
             console.error("Invalid status line:", status);

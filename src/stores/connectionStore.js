@@ -1,4 +1,4 @@
-import {decorate, observable, action} from 'mobx';
+import {decorate, observable, action, computed} from 'mobx';
 import grblStore from './grblStore';
 
 let Electron = null;
@@ -13,7 +13,6 @@ const handshakeRegex = /Grbl (.+) \['\$' for help]/;
 class ConnectionStore {
     serialport = null;
     @observable grblVersion = null;
-    @observable connected = false;
     @observable ports = null;
     @observable port = null;
     @observable history = [];
@@ -21,12 +20,18 @@ class ConnectionStore {
     @observable statusQueryInProgress = false;
     @observable statusQueryTimer = null;
 
+    lastSent = null;
 
     constructor() {
         if (Electron && Electron.remote) {
             this.serialport = Electron.remote.getGlobal('serialport');
             this.refreshPorts();
         }
+    }
+
+    @computed
+    get connected() {
+        return this.port && this.grblVersion;
     }
 
     setPorts(ports) {
@@ -71,6 +76,7 @@ class ConnectionStore {
 
     writeln(line) {
         if (this.port) {
+            this.lastSent = line;
             this.port.write(`${line}\r`)
         }
     }
@@ -97,7 +103,7 @@ class ConnectionStore {
         if (this.port) {
             if (!this.statusQueryInProgress) {
                 this.statusQueryInProgress = true;
-                console.log("Made status query");
+                //console.log("Made status query");
                 this.port.write("?");
             } else {
                 console.error("Status query already in progress");
@@ -124,11 +130,16 @@ class ConnectionStore {
                 }
                 grblStore.parseStatus(data);
             } else {
+                if ((data === "ok" || data === "error:20") && grblStore.running) {
+                    grblStore.runNextLine();
+                } else if (data.indexOf("error") > -1) {
+                    this.history.push(`> ${this.lastSent}`)
+                }
                 console.log("Data[0] is", data[0], data.charCodeAt(0));
 
                 this.history.push(data);
             }
-            console.log("Recv:", data);
+            //console.log("Recv:", data);
         }
     }
 

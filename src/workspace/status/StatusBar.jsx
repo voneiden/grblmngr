@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import styled from 'styled-components'
 import grblStore from '../../stores/grblStore';
+import gcodeStore from '../../stores/gcodeStore';
 
 @observer
 class StatusBar extends React.Component {
@@ -23,7 +24,9 @@ class StatusBar extends React.Component {
                     <div>Y <span>{ grblStore.MPos.y }</span></div>
                     <div>Z <span>{ grblStore.MPos.z }</span></div>
                 </div>
-
+                <div>
+                    <div onClick={ () => grblStore.run() }>Run program</div>
+                </div>
             </div>
         )
     }

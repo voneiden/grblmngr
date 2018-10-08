@@ -247,7 +247,7 @@ class GcodeStore {
 const gcodeStore = new GcodeStore();
 export default gcodeStore;
 export const p = new Program();
-p.parseStream(`%
+p.parseStream(`
 (FCU engravings)
 (T7  D=0.58 CR=0 - ZMIN=-0.3 - flat end mill)
 G90 G94

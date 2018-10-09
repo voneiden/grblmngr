@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import styled from 'styled-components'
 import grblStore from '../../stores/grblStore';
 import gcodeStore from '../../stores/gcodeStore';
+import renderStore from '../../stores/renderStore';
 
 @observer
 class StatusBar extends React.Component {
@@ -33,6 +34,12 @@ class StatusBar extends React.Component {
                     <div onClick={ () => grblStore.pause() }>Pause program</div>
                     <div onClick={ () => grblStore.resume() }>Resume program</div>
                     <div onClick={ () => grblStore.stop() }>STOP program</div>
+                </div>
+                <div>
+                    <div>Mouse pos</div>
+                    <div>X <span>{ renderStore.mouseWorldX }</span></div>
+                    <div>Y <span>{ renderStore.mouseWorldY }</span></div>
+                    <div>Z <span>-</span></div>
                 </div>
             </div>
         )

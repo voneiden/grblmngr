@@ -1,6 +1,5 @@
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import connectionStore from './connectionStore';
-import grblStore from './grblStore';
 import gcodeStore from './gcodeStore';
 import Enum from 'es6-enum';
 import autoBind from 'auto-bind';
@@ -130,6 +129,15 @@ class GrblStore {
         } else {
             console.error("Unable to run next line", connectionStore.connected, this.running);
         }
+    }
+
+    canJog() {
+        return connectionStore.connected && (this.machineState === MachineState.IDLE ||
+            this.machineState === MachineState.JOG);
+    }
+
+    canStopJog() {
+        return connectionStore.connected && this.machineState === MachineState.JOG;
     }
 
     pause() {

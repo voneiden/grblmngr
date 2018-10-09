@@ -6,6 +6,7 @@ import connectionStore from '../stores/connectionStore';
 import SerialConnectionTab from './tabs/SerialConnectionTab';
 import Renderer from './renderer/Renderer';
 import StatusTab from './tabs/StatusTab';
+import Jogger from './tabs/Jogger';
 import StatusBar from './status/StatusBar';
 import Editor from './tabs/Editor';
 
@@ -80,7 +81,7 @@ const SideTopContainer = styled(observer((props) => (
 
 const SideBottomContainer = styled((props) => (
     <div className={ props.className }>
-        Bjottom container
+        <Jogger/>
     </div>
 ))`
     flex-grow: 0;

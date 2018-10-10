@@ -73,7 +73,7 @@ class Renderer extends React.Component {
         this.handleResize();
         console.log("Startup completed in ", Date.now()- window.startuptime, "ms");
         window.addEventListener('resize', this.handleResize);
-        window.addEventListener('mouseup', this.handleMouseUp);
+        window.addEventListener('mouseup', this.handleMouseUp)
 
     }
 

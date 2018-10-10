@@ -12,6 +12,17 @@ class RenderStore {
     @observable mouseWorldX = 0;
     @observable mouseWorldY = 0;
 
+    lastWPosTarget = {
+        x: grblStore.WPos.x,
+        y: grblStore.WPos.y,
+        z: grblStore.WPos.z
+    };
+    lastWPosSource = {
+        x: grblStore.WPos.x,
+        y: grblStore.WPos.y,
+        z: grblStore.WPos.z
+    };
+
     majorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x003300, depthTest: false });
     minorGridMaterial = new THREE.MeshBasicMaterial( { color: 0x001100, depthTest: false });
     solidMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
@@ -30,6 +41,9 @@ class RenderStore {
     program = new THREE.Group();
     programRunner = null;
 
+    animationRunner = null;
+    animationStart = null;
+
 
     constructor() {
         // TODO do multiple scenes, and call renderer.clearDepth() to make stuff come out in correct order
@@ -44,10 +58,12 @@ class RenderStore {
         this.scene.add(this.mill);
         this.scene.add(this.program);
 
+        /**
         this.millRunner = autorun(() => {
             this.mill.position.set(grblStore.WPos.x, grblStore.WPos.y, grblStore.WPos.z);
             this.doRender();
         });
+         */
 
         this.programRunner = autorun(() => {
             const program = gcodeStore.program;
@@ -69,11 +85,44 @@ class RenderStore {
                     segmentActions.push(action);
                 }
                 this.createMotionSegment(previousMotion, segmentActions);
-                this.doRender();
+
             }
         });
 
+        this.animationRunner = autorun(() => {
+            if (grblStore.WPos.x !== this.lastWPosTarget.x ||
+                grblStore.WPos.y !== this.lastWPosTarget.y ||
+                grblStore.WPos.z !== this.lastWPosTarget.z) {
+                this.lastWPosSource.x = parseFloat(this.lastWPosTarget.x);
+                this.lastWPosSource.y = parseFloat(this.lastWPosTarget.y);
+                this.lastWPosSource.z = parseFloat(this.lastWPosTarget.z);
+                this.lastWPosTarget.x = grblStore.WPos.x;
+                this.lastWPosTarget.y = grblStore.WPos.y;
+                this.lastWPosTarget.z = grblStore.WPos.z;
+                this.animationStart = performance.now();
+                window.requestAnimationFrame((timestamp) => this.doAnimate(timestamp));
+            }
+            this.doRender();
+        });
+
         autoBind(this);
+    }
+
+    doAnimate(timestamp) {
+        const delta = timestamp - this.animationStart;
+        const fraction = delta / 200;
+        if (fraction > 1) {
+            return;
+        }
+        const tx = parseFloat(this.lastWPosTarget.x);
+        const ty = parseFloat(this.lastWPosTarget.y);
+        const tz = parseFloat(this.lastWPosTarget.z);
+        const x = this.lastWPosSource.x + (tx - this.lastWPosSource.x) * fraction;
+        const y = this.lastWPosSource.y + (ty - this.lastWPosSource.y) * fraction;
+        const z = this.lastWPosSource.z + (tz - this.lastWPosSource.z) * fraction;
+        this.mill.position.set(x, y, z);
+        this.doRender();
+        window.requestAnimationFrame((timestamp) => this.doAnimate(timestamp));
     }
 
     doRender() {

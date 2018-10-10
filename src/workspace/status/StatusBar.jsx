@@ -4,11 +4,29 @@ import styled from 'styled-components'
 import grblStore from '../../stores/grblStore';
 import gcodeStore from '../../stores/gcodeStore';
 import renderStore from '../../stores/renderStore';
+import autoBind from 'auto-bind';
 
 @observer
 class StatusBar extends React.Component {
     constructor(props) {
         super(props);
+        autoBind(this);
+    }
+
+    handleWPosSet(e) {
+        console.log("E", e.target);
+    }
+    handleWPosBlur(e) {
+        // TODO reset value
+    }
+    handleWPosKeydown(e) {
+        if (e.key === "Enter") {
+            console.log("Commit value");
+        } else if (e.key === "Escape") {
+            e.target.blur();
+        } else {
+            console.log(e.key);
+        }
     }
     render() {
         return (
@@ -21,7 +39,11 @@ class StatusBar extends React.Component {
                 </div>
                 <div>
                     <div>WPos</div>
-                    <div>X <span>{ grblStore.WPos.x }</span> <span onClick={ () => grblStore.zeroX() }>Zero</span></div>
+                    <div>X <input
+                        onChange={(e) => this.handleWPosSet(e)}
+                        onBlur={(e) => this.handleWPosBlur(e) }
+                        onKeyDown={(e) => this.handleWPosKeydown(e)}
+                        value={ grblStore.WPos.x }/> <span onClick={ () => grblStore.zeroX() }>Zero</span></div>
                     <div>Y <span>{ grblStore.WPos.y }</span> <span onClick={ () => grblStore.zeroY() }>Zero</span></div>
                     <div>Z <span>{ grblStore.WPos.z }</span> <span onClick={ () => grblStore.zeroZ() }>Zero</span></div>
                 </div>

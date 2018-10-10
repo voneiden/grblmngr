@@ -166,7 +166,7 @@ class RenderStore {
             this.gridScene.add(this.drawLine(w, heightStart, w, heightEnd, 0, this.majorGridMaterial, -1));
         }
         for (let h=heightStart; h <= heightEnd; h+= major) {
-            for (let hm=h + minor; hm < h + major; hm += minor) {
+            for (let hm=h + minor; hm < h + major && h < heightEnd; hm += minor) {
                 this.gridScene.add(this.drawLine(widthStart, hm, widthEnd, hm, 0, this.minorGridMaterial, -2));
             }
             this.gridScene.add(this.drawLine(widthStart, h, widthEnd, h, 0, this.majorGridMaterial, -1));

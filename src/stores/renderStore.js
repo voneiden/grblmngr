@@ -273,6 +273,21 @@ class RenderStore {
         this.mouseWorldX = mouseX.toFixed(3);
         this.mouseWorldY = mouseY.toFixed(3);
     }
+
+    @action
+    zoomIn() {
+        this.camera.zoom *= 1.1;
+        console.log(this.camera.zoom);
+        this.camera.updateProjectionMatrix();
+        this.doRender();
+    }
+
+    @action
+    zoomOut() {
+        this.camera.zoom /= 1.1;
+        this.camera.updateProjectionMatrix();
+        this.doRender();
+    }
 }
 const renderStore = new RenderStore();
 export default renderStore;

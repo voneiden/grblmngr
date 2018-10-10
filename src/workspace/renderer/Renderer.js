@@ -60,6 +60,14 @@ class Renderer extends React.Component {
             this.panning = false;
         }
     }
+    handleMouseWheel(e) {
+        console.log(e.deltaY);
+        if (e.deltaY > 0) {
+            renderStore.zoomOut();
+        } else {
+            renderStore.zoomIn();
+        }
+    }
 
     componentDidMount() {
         const width = this.canvas.offsetWidth;
@@ -73,8 +81,7 @@ class Renderer extends React.Component {
         this.handleResize();
         console.log("Startup completed in ", Date.now()- window.startuptime, "ms");
         window.addEventListener('resize', this.handleResize);
-        window.addEventListener('mouseup', this.handleMouseUp)
-
+        window.addEventListener('mouseup', this.handleMouseUp);
     }
 
     componentWillUnmount() {
@@ -86,7 +93,8 @@ class Renderer extends React.Component {
                 className={ this.props.className }
                 ref={(r) => this.container = r }
                 onMouseDown={ (e) => this.handleMouseDown(e) }
-                onMouseMove={ (e) => this.handleMouseMove(e) }>
+                onMouseMove={ (e) => this.handleMouseMove(e) }
+                onWheel={ (e) => this.handleMouseWheel(e) }>
                 <canvas ref={(r) => this.canvas = r}/>
             </div>
         )

@@ -38,8 +38,8 @@ class Renderer extends React.Component {
             let dx = e.clientX - this.mouseX;
             let dy = e.clientY - this.mouseY;
             let pos = renderStore.camera.position;
-            pos.setX(pos.x - dx / 5); // Todo appropriate factor based on zoom
-            pos.setY(pos.y + dy / 5);
+            pos.setX(pos.x - dx / (renderStore.camera.zoom / 2));
+            pos.setY(pos.y + dy / (renderStore.camera.zoom / 2));
             renderStore.doRender();
         }
         this.mouseX = e.clientX;

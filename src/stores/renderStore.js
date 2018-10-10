@@ -270,8 +270,8 @@ class RenderStore {
 
     @action
     setMouseWorldPosition(mouseX, mouseY) {
-        this.mouseWorldX = mouseX;
-        this.mouseWorldY = mouseY;
+        this.mouseWorldX = mouseX.toFixed(3);
+        this.mouseWorldY = mouseY.toFixed(3);
     }
 }
 const renderStore = new RenderStore();

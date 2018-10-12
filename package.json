@@ -6,6 +6,7 @@
     "auto-bind": "1.2.1",
     "brace": "0.11.1",
     "es6-enum": "1.1.0",
+    "mathjs": "5.2.0",
     "mobx": "5.1.2",
     "mobx-react": "5.2.8",
     "object-assign": "4.1.1",

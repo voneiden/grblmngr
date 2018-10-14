@@ -6,7 +6,7 @@ import autoBind from 'auto-bind';
 
 
 @observer
-class Jogger extends React.Component {
+class JoggerGrid extends React.Component {
     constructor(props) {
         super(props);
         autoBind(this);
@@ -18,6 +18,7 @@ class Jogger extends React.Component {
                     <div onClick={ () => jogStore.jog(-1, 1) }>\</div>
                     <div onClick={ () => jogStore.jog(0, 1) }>|</div>
                     <div onClick={ () => jogStore.jog(1, 1) }>/</div>
+                    <div onClick={ () => jogStore.jog(0, 0, 1) }>Z+</div>
                 </div>
                 <div>
                     <div onClick={ () => jogStore.jog(-1,  0) }>--</div>
@@ -28,13 +29,14 @@ class Jogger extends React.Component {
                     <div onClick={ () => jogStore.jog(-1, -1) }>/</div>
                     <div onClick={ () => jogStore.jog(0, -1) }>|</div>
                     <div onClick={ () => jogStore.jog(1, -1) }>\</div>
+                    <div onClick={ () => jogStore.jog(0, 0, -1) }>Z-</div>
                 </div>
             </div>
         );
     }
 };
 
-Jogger = styled(Jogger)`
+JoggerGrid = styled(JoggerGrid)`
   display: flex;
   flex-direction: column;
   > div {
@@ -50,5 +52,14 @@ Jogger = styled(Jogger)`
     }
   }
 `;
-
+//
+class Jogger extends React.Component {
+    render() {
+        return (
+            <div>
+                <JoggerGrid/>
+            </div>
+        )
+    }
+}
 export default Jogger;

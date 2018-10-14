@@ -132,8 +132,14 @@ class GrblStore {
     }
 
     canJog() {
-        return connectionStore.connected && (this.machineState === MachineState.IDLE ||
-            this.machineState === MachineState.JOG);
+        return connectionStore.connected &&
+            (this.machineState === MachineState.IDLE || this.machineState === MachineState.JOG) &&
+            !this.running;
+    }
+    canStep() {
+        return connectionStore.connected &&
+            this.machineState === MachineState.IDLE &&
+            !this.running
     }
 
     canStopJog() {
